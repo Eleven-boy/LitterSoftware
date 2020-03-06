@@ -44,15 +44,14 @@ void HorizontalMoving(float x,float y)
 		for (uint8_t i = 0; i < 3; i++)
 		{
 				RequestStop(BIG_CLAW); //请求大爪433停止发送数据
-				delay_ms(200);
 				RequestStart(BIG_CAR); //请求大车433发送数据	
-				delay_ms(200);
 		}
 	}
 	
 	err_x = laser.dis6-x;
 	err_y = laser.dis7-y;
 	
+	//大行车X方向移动
 	while(abs(err_x)>2000)//偏差大于一定范围时，要移动
 	{
 		err_x = laser.dis6 - x;    //24米
@@ -85,29 +84,256 @@ void HorizontalMoving(float x,float y)
 			X_MOVE_BIT = 1;
 			//大行车开始向南点动
 		}
-		else if( (err_x>0) && (0==X_MOVE_BIT) )
+		else if( (err_x>0) && (0==X_MOVE_BIT) )//大行车开始向北运动
 		{
 			//大行车开始向北运动
-			 
+			CAR_NORTH(ON);
+			while(err_x>2000)
+			{
+					//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+					delay_ms(100); 
+					err_x = laser.dis6 - x;    //24米             
+			}  			
+			CAR_NORTH(OFF);
+			//大行车反向制动
+			for (uint8_t i = 0; i < 2; i++)//大行车反向制动
+			{
+					CAR_SOUTH(ON);
+					for (uint8_t j = 0; j < 10; j++)
+					{
+							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+							delay_ms(100); 
+							err_x = laser.dis6 - x;    //24米
+					}
+					CAR_SOUTH(OFF);
+					delay_ms(1000);
+			}	
+			X_MOVE_BIT = 1;
 		}
 		delay_ms(100);
 	}
-	if((abs(err_x)<2000)||(1==X_MOVE_BIT))
+	//大行车X方向开始点动
+	if((abs(err_x)<2000)||(1==X_MOVE_BIT))//大行车X方向点动模式
 	{
-	
+		CAR_SOUTH(OFF);
+		CAR_NORTH(OFF);
+		if(err_x<0)//大行车向南点动
+		{
+			while(err_x<(-200))
+			{
+					CAR_SOUTH(ON);
+					for (uint8_t i = 0; i < 8; i++)
+					{
+							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+							delay_ms(100); 
+							err_x = laser.dis6 - x;    //24米
+					}
+					CAR_SOUTH(OFF);
+					delay_ms(1000); 
+			}
+			CAR_SOUTH(OFF);			
+		}
+		else if(err_x>=0)//大行车向北点动
+		{
+			while(err_x>200)
+			{
+					CAR_NORTH(ON);
+					for (uint8_t i = 0; i < 8; i++)
+					{
+							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+							delay_ms(100); 
+							err_x = laser.dis6 - x;    //24米  
+					}
+					CAR_NORTH(OFF);
+					delay_ms(500);
+			}
+			CAR_NORTH(OFF);			
+		}
+		X_MOVE_BIT = 2; 
 	}
 		
-	while(abs(err_y)>2000)
-	{}
-	if ((abs(err_y)<2000)||(1==Y_MOVE_BIT))
-	{}		
+	//大行车Y方向移动
+	while(abs(err_y)>2000)//大行车Y方向移动
+	{
+		err_x = laser.dis6 - x;    //24米
+		err_y = laser.dis7 - y;    //12米
+		
+		//Now is moving to the Y destnation
+		if ((err_y>0)&&(0==Y_MOVE_BIT)&&(2==X_MOVE_BIT))//大行车向东运动
+		{
+			CAR_EAST(ON); 
+			while(abs(err_y)>2000)
+			{
+				//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+				delay_ms(100); 
+				err_y = laser.dis7 - y;    //12米
+			}
+			Y_MOVE_BIT = 1;
+			CAR_EAST(OFF); 
+		}
+		else if ((err_y<0) && (0==Y_MOVE_BIT)&&(2==X_MOVE_BIT))//大行车向西运动
+		{
+			CAR_WEST(ON);
+			while(abs(err_y)>2000)
+			{
+				//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+				delay_ms(100); 
+				err_y = laser.dis7 - y;    //12米		
+			}
+			Y_MOVE_BIT = 1;
+			CAR_WEST(OFF);
+		}	
+		delay_ms(100);
+	}
+	//大行车Y方向点动
+	if ((abs(err_y)<2000)||(1==Y_MOVE_BIT))//大行车Y方向点动
+	{
+		CAR_WEST(OFF);
+		CAR_EAST(OFF);
+		while ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10))//等待mpu6050数据稳定
+		{
+			 
+		}   		
+		if(err_y<0)//大行车向西点动
+		{
+			while(err_y<(-200))
+			{
+					CAR_WEST(ON);
+					for (uint8_t i = 0; i < 8; i++)
+					{
+							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+							delay_ms(100); 
+							err_y = laser.dis7 - y;    //12米
+					}
+					CAR_WEST(OFF);
+					delay_ms(500);
+			}
+			CAR_WEST(OFF);
+		}
+		else if(err_y>0)
+		{
+			while(err_y>200)
+			{
+					CAR_EAST(ON);
+					for (uint8_t i = 0; i < 8; i++)
+					{
+							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
+							delay_ms(100); 
+							err_y = laser.dis7 - y;    //12米
+					}
+					CAR_EAST(OFF);
+					delay_ms(500);
+			}
+			CAR_EAST(OFF);		
+		}
+		Y_MOVE_BIT = 2; 
+		RequestStop(BIG_CAR);//请求大行车433停止数据发送
+	}		
 }
 //竖直移动
 void VerticalMoving(float z)
 {
-
+	float paw_err=0; 
+	float paw_nowDis = 0;
+	float paw_err_last=0;
+	uint8_t count = 0;
+	uint8_t same_dis_count=0;
+	
+	RequestStop(BIG_CAR); //请求大车433停止发送数据	
+	RequestStop(BURN_POOL); //请求料坑433停止发送数据	
+	RequestStart(BIG_CLAW); //请求大抓433发送数据		
+	
+	while (laser.dis1<=0)//判断大爪上传数据是否正常
+	{
+		PAW_DOWN(ON);
+		count++;
+		if (count>5)
+		{   
+				for (uint8_t i = 0; i < 5; i++)
+				{
+					RequestStop(BIG_CAR); //请求大车433停止发送数据	
+					RequestStop(BURN_POOL); //请求料坑433停止发送数据	
+					RequestStart(BIG_CLAW); //请求大抓433发送数据	
+				}
+				count=0;
+		}		
+		PAW_DOWN(OFF);
+		delay_ms(10);
+	}
+	paw_err = laser.dis1 - z;
+	//大爪下降
+	while(abs(paw_err)>1000)//大爪下降
+	{
+		if((paw_err>=0)&&(DOWN_BIT==0))//大爪下降
+		{
+			PAW_DOWN(ON);
+			while(paw_err>1000)
+			{                 
+				//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+				delay_ms(100);   
+				if (laser.dis1<0)//滤除偶尔出现的错误值
+				{
+					laser.dis1=laser.last_dis1;
+				}				
+				paw_nowDis=laser.dis1;     
+				paw_err = paw_nowDis - z;    
+				laser.last_dis1 = laser.dis1;   
+			}			
+			PAW_DOWN(OFF);
+			DOWN_BIT=1;  //下降标志位
+		}
+		paw_err = laser.dis1 - z;
+		delay_ms(100);
+	}
+	//大爪下降到指定高度，准备点动
+	if((abs(paw_err)<1000)&&(1==DOWN_BIT))//大爪下降到指定高度，准备点动
+ 	{
+		while ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10))//等待mpu6050数据稳定
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+			delay_ms(100);
+		}
+		PAW_DOWN(ON);
+		while(paw_err>200)//开始点动
+		{
+			PAW_DOWN(ON);
+			for (uint8_t i = 0; i < 10; i++)//点动程序
+			{
+				//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+				delay_ms(100);  
+				paw_nowDis=laser.dis1;        
+				paw_err = paw_nowDis - z;      
+			}
+			PAW_DOWN(OFF);		
+			delay_ms(500); 
+			if ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10.0))//爪子倾斜超过一定角度，停止下降，跳出循环
+			{
+					PAW_DOWN(OFF);
+					break;
+			} 
+			
+			if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+			{
+					same_dis_count = same_dis_count+1;
+			}
+			else
+			{
+					same_dis_count=0;
+			}
+			
+			if (same_dis_count>5)
+			{
+					PAW_DOWN(OFF);
+					break;
+			}	
+			paw_err_last=paw_err;			
+		}
+		PAW_DOWN(OFF);
+		//大爪下降结束
+		RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+	}
 }
-//数值降落到初始位置
+//竖直降落到初始位置
 void VerticalMoveOrigin(float z)
 {
 
@@ -161,7 +387,7 @@ void RisePawFromBurnPool(void)
 	if(abs(err)>200)//绝对值大于200
 	{
 		Big_Claw_Up_Delay_Pool_Flag=1;
-		CAR_UP(ON);//爪子开始上升
+		PAW_UP(ON);//爪子开始上升
 	}
 	
 	while(abs(err)>200)
@@ -216,7 +442,7 @@ void RisePawFromBurnPool(void)
 				break;
 		}
 	}
-	CAR_UP(OFF);//爪子停止上升
+	PAW_UP(OFF);//爪子停止上升
 	
 	while ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10))//等待mpu6050数值稳定
 	{
