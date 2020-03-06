@@ -1,0 +1,57 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.14.0.0
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: zsy zsy, ujs, LIC=W96Y8-3ZF0X-QGB7I-TCF9B-KRD7J-Y1X6N
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.14.0.0
+Toolchain Path:  E:\Program Files (x86)\Keil_core\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.05 update 1 (build 106)
+Assembler:       Armasm.exe V5.05 update 1 (build 106)
+Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
+Library Manager: ArmAr.exe V5.05 update 1 (build 106)
+Hex Converter:   FromElf.exe V5.05 update 1 (build 106)
+CPU DLL:         SARMCM3.DLL V5.14.0.0
+Dialog DLL:      DCM.DLL V1.13.1.0
+Target DLL:      CMSIS_AGDI.dll V1.21.0.0
+Dialog DLL:      TCM.DLL V1.14.4.0
+ 
+<h2>Project:</h2>
+G:\Litter\Software\main_control_v3\Project\RVMDK（uv5）\Herbicidal.uvprojx
+Project File Date:  03/02/2020
+
+<h2>Output:</h2>
+Build target 'HERBICIDAL'
+compiling main.c...
+compiling relay.c...
+compiling Task.c...
+..\..\User\Task\Task.c(30): warning:  #177-D: variable "err_x" was declared but never referenced
+        float   err_x=0;     // 默认为0，出错不会移动
+..\..\User\Task\Task.c(31): warning:  #177-D: variable "err_y" was declared but never referenced
+        float   err_y=0;
+..\..\User\Task\Task.c(32): warning:  #177-D: variable "count" was declared but never referenced
+        uint8_t count=0;
+..\..\User\Task\Task.c(99): warning:  #223-D: function "CAR_UP" declared implicitly
+                CAR_UP(ON);//爪子开始上升
+..\..\User\Task\Task.c(154): warning:  #223-D: function "CAR_UP" declared implicitly
+        CAR_UP(OFF);//爪子停止上升
+..\..\User\Task\Task.c: 5 warnings, 0 errors
+linking...
+..\..\Output\Herbicidal.axf: Error: L6218E: Undefined symbol CAR_UP (referred from task.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 1 error messages.
+"..\..\Output\Herbicidal.axf" - 1 Error(s), 5 Warning(s).
+
+<h2>Collection of Component include folders:</h2>
+  G:\Litter\Software\main_control_v3\Project\RVMDK（uv5）\RTE
+  E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+Target not created.
+</pre>
+</body>
+</html>
