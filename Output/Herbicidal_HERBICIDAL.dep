@@ -1301,7 +1301,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
-F (..\..\User\main.c)(0x5E5C6BF1)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\main.o --omf_browse ..\..\output\main.crf --depend ..\..\output\main.d)
+F (..\..\User\main.c)(0x5E65B875)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\main.o --omf_browse ..\..\output\main.crf --depend ..\..\output\main.d)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
 I (..\..\Libraries\CMSIS\Include\core_cm4.h)(0x58CE0BFE)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdint.h)(0x5475F300)
@@ -1344,11 +1344,12 @@ I (..\..\User\ADC\ADC.h)(0x5D36C190)
 I (..\..\User\relay\relay.h)(0x5E5DCA5E)
 I (..\..\User\exti\exti.h)(0x5E3630BF)
 I (..\..\User\alarm\alarm.h)(0x5E3628FE)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 I (..\..\User\key\bsp_key.h)(0x5D317B4C)
 I (..\..\User\USART1\usart1.h)(0x5E59DF7E)
 I (..\..\User\USART2\usart2.h)(0x5D57EEAE)
 I (..\..\User\UART4\uart4.h)(0x5E362A1A)
+I (..\..\User\Task\task.h)(0x5E65B92D)
 I (..\..\User\Control\Control.h)(0x5E28FDB8)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdbool.h)(0x5475F300)
 F (..\..\User\stm32f4xx_it.c)(0x5D26D1FF)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\stm32f4xx_it.o --omf_browse ..\..\output\stm32f4xx_it.crf --depend ..\..\output\stm32f4xx_it.d)
@@ -1535,7 +1536,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
 I (..\..\User\Control\Control.h)(0x5E28FDB8)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 F (..\..\User\Beep\beep.c)(0x5D311704)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\beep.o --omf_browse ..\..\output\beep.crf --depend ..\..\output\beep.d)
 I (..\..\User\Beep\beep.h)(0x5DD66FD6)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
@@ -1572,7 +1573,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
-F (..\..\User\USART1\usart1.c)(0x5E5C6D6C)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\usart1.o --omf_browse ..\..\output\usart1.crf --depend ..\..\output\usart1.d)
+F (..\..\User\USART1\usart1.c)(0x5E659DAC)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\usart1.o --omf_browse ..\..\output\usart1.crf --depend ..\..\output\usart1.d)
 I (..\..\User\USART1\usart1.h)(0x5E59DF7E)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
 I (..\..\Libraries\CMSIS\Include\core_cm4.h)(0x58CE0BFE)
@@ -1609,7 +1610,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
 I (..\..\User\systick\bsp_SysTick.h)(0x5E5C64FB)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 F (..\..\User\USART2\usart2.c)(0x5E59DA26)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\usart2.o --omf_browse ..\..\output\usart2.crf --depend ..\..\output\usart2.d)
 I (..\..\User\USART2\usart2.h)(0x5D57EEAE)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
@@ -1647,7 +1648,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
 I (..\..\User\led\bsp_led.h)(0x5E312BBC)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 F (..\..\User\USART3\usart3.c)(0x5D3678E7)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\usart3.o --omf_browse ..\..\output\usart3.crf --depend ..\..\output\usart3.d)
 I (..\..\User\USART3\usart3.h)(0x5D27140E)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
@@ -1760,7 +1761,7 @@ I (..\..\User\led\bsp_led.h)(0x5E312BBC)
 I (..\..\User\Beep\beep.h)(0x5DD66FD6)
 I (..\..\User\Control\Control.h)(0x5E28FDB8)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 F (..\..\User\ADC\ADC.c)(0x5E5C6534)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\adc.o --omf_browse ..\..\output\adc.crf --depend ..\..\output\adc.d)
 I (..\..\User\ADC\ADC.h)(0x5D36C190)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
@@ -1798,8 +1799,8 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
 I (..\..\User\systick\bsp_SysTick.h)(0x5E5C64FB)
-F (..\..\User\Data_type\Data_type.c)(0x5E59D9E1)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\data_type.o --omf_browse ..\..\output\data_type.crf --depend ..\..\output\data_type.d)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+F (..\..\User\Data_type\Data_type.c)(0x5E65AFBE)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\data_type.o --omf_browse ..\..\output\data_type.crf --depend ..\..\output\data_type.d)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
 I (..\..\Libraries\CMSIS\Include\core_cm4.h)(0x58CE0BFE)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdint.h)(0x5475F300)
@@ -1837,7 +1838,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
 F (..\..\User\Control\Control.c)(0x5E5DC65B)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\control.o --omf_browse ..\..\output\control.crf --depend ..\..\output\control.d)
 I (..\..\User\Control\Control.h)(0x5E28FDB8)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdbool.h)(0x5475F300)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
 I (..\..\Libraries\CMSIS\Include\core_cm4.h)(0x58CE0BFE)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdint.h)(0x5475F300)
@@ -1876,7 +1877,7 @@ I (..\..\User\led\bsp_led.h)(0x5E312BBC)
 I (..\..\User\UART4\uart4.h)(0x5E362A1A)
 I (..\..\User\USART2\usart2.h)(0x5D57EEAE)
 I (..\..\User\Beep\beep.h)(0x5DD66FD6)
-I (..\..\User\Task\task.h)(0x5E5C797E)
+I (..\..\User\Task\task.h)(0x5E65B92D)
 F (..\..\User\relay\relay.c)(0x5E5C6517)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\relay.o --omf_browse ..\..\output\relay.crf --depend ..\..\output\relay.d)
 I (..\..\User\relay\relay.h)(0x5E5DCA5E)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
@@ -1986,8 +1987,8 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
-F (..\..\User\Task\Task.c)(0x5E61CACA)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\task.o --omf_browse ..\..\output\task.crf --depend ..\..\output\task.d)
-I (..\..\User\Task\task.h)(0x5E5C797E)
+F (..\..\User\Task\Task.c)(0x5E65B92D)(--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include -I..\..\Libraries\CMSIS\Include -I..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc -I..\..\User -I..\..\User\systick -I..\..\User\GPIO -I..\..\User\led -I..\..\User\Beep -I..\..\User\key -I..\..\User\basic_tim -I..\..\User\UART4 -I..\..\User\USART1 -I..\..\User\USART2 -I..\..\User\USART3 -I..\..\User\USART6 -I..\..\User\ADC -I..\..\User\Data_type -I..\..\User\Control -I..\..\User\relay -I..\..\User\alarm -I..\..\User\exti -I..\..\User\Task-I G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK£¨uv5£©\RTE-I "E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include"-I "E:\Program Files (x86)\Keil_core\ARM\CMSIS\Include"-D__UVISION_VERSION="514" -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx-o ..\..\output\task.o --omf_browse ..\..\output\task.crf --depend ..\..\output\task.d)
+I (..\..\User\Task\task.h)(0x5E65B92D)
 I (..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x5710F354)
 I (..\..\Libraries\CMSIS\Include\core_cm4.h)(0x58CE0BFE)
 I (E:\Program Files (x86)\Keil_core\ARM\ARMCC\include\stdint.h)(0x5475F300)
@@ -2022,7 +2023,7 @@ I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x58CE0BFE)
 I (..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x58CE0BFE)
-I (..\..\User\Data_type\Data_type.h)(0x5E5C79C8)
+I (..\..\User\Data_type\Data_type.h)(0x5E65B92B)
 I (..\..\User\USART1\usart1.h)(0x5E59DF7E)
 I (..\..\User\systick\bsp_SysTick.h)(0x5E5C64FB)
 I (..\..\User\relay\relay.h)(0x5E5DCA5E)

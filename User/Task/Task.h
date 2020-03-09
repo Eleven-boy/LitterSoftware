@@ -38,12 +38,15 @@ extern int64_t Big_Claw_Up_Delay_Pool;
 extern uint8_t Big_Claw_Up_Delay_Pool_Flag;
 /************************************************************/
 
-
+void BigCarRunning(void);
 void HorizontalMoving(float x,float y);
 void VerticalMoving(float z);
+void VerticalMoveOrigin(float z);
 void ClosePaw(void);
 void ReleasePaw(void);
 void RisePawFromBurnPool(void);
-
+void RisePawFromLitterPool(void);
+void LowerClawtoPool(void);
+void ResetFlagBit(void);
 #endif /* __TASK_H */
 

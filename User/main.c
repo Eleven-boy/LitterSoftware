@@ -3,7 +3,7 @@
   * @file    main.c
   * @author  yueran
   * @version V1.0
-  * @date    2020-02-25
+  * @date    2020-03-09
   * @brief   无锡固废项目--大爪子
   ******************************************************************************
   * @attention
@@ -33,9 +33,8 @@
 #include "usart1.h"
 #include "usart2.h"
 #include "uart4.h"
+#include "task.h"
 #include "Control.h"	
-
-
 
 
 int main(void)
@@ -55,6 +54,12 @@ int main(void)
 	
 	RequestStop(ALL_DEV);//初始化请求所有433关闭发送
 	
+//	Target.x[0] = 13000;
+//	Target.y[0] = 4000;
+//	Target.z[0] = 1600; 
+//	Origin.x[0] = 7900;
+//	Origin.y[0] = 4000;
+//	Origin.z[0] = 1700;	
 	
 	while(1) 
   { 

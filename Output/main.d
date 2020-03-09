@@ -47,5 +47,6 @@
 ..\..\output\main.o: ..\..\User\USART1\usart1.h
 ..\..\output\main.o: ..\..\User\USART2\usart2.h
 ..\..\output\main.o: ..\..\User\UART4\uart4.h
+..\..\output\main.o: ..\..\User\Task\task.h
 ..\..\output\main.o: ..\..\User\Control\Control.h
 ..\..\output\main.o: E:\Program Files (x86)\Keil_core\ARM\ARMCC\Bin\..\include\stdbool.h

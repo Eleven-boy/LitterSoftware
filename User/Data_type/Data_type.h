@@ -8,8 +8,6 @@
  *******************************************************/
 //限幅
 #define LIMIT( x,min,max ) ( (x) < (min)  ? (min) : ( (x) > (max) ? (max) : (x) ) )
-
-
 /*******************************************************
  *                     结构体定义
  *******************************************************/
@@ -53,13 +51,13 @@ extern MPU6050 mpu;
 
 //位置坐标
 typedef struct{
-    int x[2];
-    int y[2];
-    int z[2];
-}POSITION;
+    float x[2];
+    float y[2];
+    float z[2];
+}POSITION; 
 extern POSITION Origin;//起始位置
-extern POSITION Target;//目标位置
-extern POSITION BURN_POOL_Target;//料坑目标位置
+extern POSITION Target;//目标位置 
+//extern POSITION BURN_POOL_Target;//料坑目标位置
 
 typedef struct
 {																						  

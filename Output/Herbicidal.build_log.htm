@@ -26,22 +26,33 @@ Project File Date:  03/02/2020
 
 <h2>Output:</h2>
 Build target 'HERBICIDAL'
+compiling main.c...
+compiling bsp_basic_tim.c...
+compiling usart1.c...
+compiling usart2.c...
+..\..\User\USART2\usart2.c(161): warning:  #177-D: function "USART_DMA_Tx_init" was declared but never referenced
+  static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
+..\..\User\USART2\usart2.c: 1 warning, 0 errors
+compiling uart4.c...
+compiling Data_type.c...
+compiling Control.c...
 compiling Task.c...
-..\..\User\Task\Task.c(37): warning:  #177-D: variable "count" was declared but never referenced
+..\..\User\Task\Task.c(51): warning:  #177-D: variable "count" was declared but never referenced
         uint8_t count=0;
-..\..\User\Task\Task.c(309): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                        if ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10.0))//爪子倾斜超过一定角度，停止下降，跳出循环
-..\..\User\Task\Task.c: 2 warnings, 0 errors
+..\..\User\Task\Task.c: 1 warning, 0 errors
 linking...
-Program Size: Code=8180 RO-data=424 RW-data=108 ZI-data=2516  
-FromELF: creating hex file...
-"..\..\Output\Herbicidal.axf" - 0 Error(s), 2 Warning(s).
+..\..\Output\Herbicidal.axf: Error: L6218E: Undefined symbol Origin (referred from task.o).
+..\..\Output\Herbicidal.axf: Error: L6218E: Undefined symbol Target (referred from task.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 2 error messages.
+"..\..\Output\Herbicidal.axf" - 2 Error(s), 2 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   G:\Litter\Software\main_control_v3\LitterSoftware\Project\RVMDK（uv5）\RTE
   E:\Program Files (x86)\Keil_MDK\Keil\STM32F4xx_DFP\1.0.8\Device\Include
 
 <h2>Collection of Component Files used:</h2>
+Target not created.
 </pre>
 </body>
 </html>
