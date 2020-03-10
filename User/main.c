@@ -35,11 +35,36 @@
 #include "uart4.h"
 #include "task.h"
 #include "Control.h"	
-
-
+ /*
+ *************************************************************************
+ *                        函数声明
+ *************************************************************************  
+ */
+void BSP_Init(void);
 int main(void)
 {	
 	SysTick_Init();                 //系统时钟初始化
+  BSP_Init();                     //相关硬件初始化
+	
+	RequestStop(ALL_DEV);//初始化请求所有433关闭发送
+	
+	//初始值
+	target.x[0] = 13000;
+	target.y[0] = 4000;
+	target.z[0] = 1600;
+	origin.x[0] = 7900;
+	origin.y[0] = 4000;
+	origin.z[0] = 1700;	
+	
+	while(1) 
+  { 
+		BigCarRunning();
+		delay_ms(200);
+	}	 
+}
+
+void BSP_Init(void)
+{
   LED_Init();                     //LED初始化
 	Key_Init();                     //按键初始化
 	ADC_DMA_Init();                 //ADC_DMA初始化
@@ -50,20 +75,4 @@ int main(void)
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
 	UART4_Init(115200);	            //UART4初始化(用于调试用)
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
-
-	
-	RequestStop(ALL_DEV);//初始化请求所有433关闭发送
-	
-//	Target.x[0] = 13000;
-//	Target.y[0] = 4000;
-//	Target.z[0] = 1600; 
-//	Origin.x[0] = 7900;
-//	Origin.y[0] = 4000;
-//	Origin.z[0] = 1700;	
-	
-	while(1) 
-  { 
-		
-	}	 
 }
-

@@ -8,6 +8,8 @@
  *                       全局变量
  *************************************************************************  
  */
+POSITION origin;//起始位置
+POSITION target;//目标位置 
 
 uint8_t X_MOVE_BIT=0;
 uint8_t Y_MOVE_BIT=0;
@@ -24,11 +26,11 @@ void BigCarRunning(void)
 {
 	/*big car starts running!*/
 	RelayOn();//打开遥控器
-	
+
 	RisePawFromBurnPool();//开始提升爪子
-	Target.x[0] = (GARBAGE_X-Target.x[0]-BIG_CAR_X_OFFSET)+ADD_X;
-	HorizontalMoving(Target.x[0],Target.y[0]);//水平移动至垃圾池
-	VerticalMoving(Target.z[0]); 
+	target.x[0] = (GARBAGE_X-target.x[0]-BIG_CAR_X_OFFSET)+ADD_X;
+	HorizontalMoving(target.x[0],target.y[0]);//水平移动至垃圾池
+	VerticalMoving(target.z[0]); 
 	ClosePaw();
 	ResetFlagBit(); 
 	
@@ -39,8 +41,8 @@ void BigCarRunning(void)
 	ResetFlagBit(); 
 	
 	RisePawFromBurnPool();//从焚烧池向上提爪子
-	HorizontalMoving(Origin.x[0],Origin.y[0]);//水平移动之初始位置
-	VerticalMoveOrigin(Origin.z[0]);//下降至四楼平台
+	HorizontalMoving(origin.x[0],origin.y[0]);//水平移动之初始位置
+	VerticalMoveOrigin(origin.z[0]);//下降至四楼平台
 	RelayOff();//关闭遥控器 
 }
 //水平移动

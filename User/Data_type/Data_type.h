@@ -49,14 +49,15 @@ typedef struct{
 }MPU6050;
 extern MPU6050 mpu;
 
+
 //位置坐标
 typedef struct{
     float x[2];
     float y[2];
     float z[2];
 }POSITION; 
-extern POSITION Origin;//起始位置
-extern POSITION Target;//目标位置 
+extern POSITION origin;//起始位置
+extern POSITION target;//目标位置 
 //extern POSITION BURN_POOL_Target;//料坑目标位置
 
 typedef struct
