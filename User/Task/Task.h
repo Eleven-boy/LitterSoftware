@@ -47,6 +47,8 @@ void RisePawFromBurnPool(void);
 void RisePawFromLitterPool(void);
 void LowerClawtoPool(void);
 void XMoving(float x);
+void YMoving(float y);
+void DownPaw(float z);
 void ResetFlagBit(void);
 #endif /* __TASK_H */
 
