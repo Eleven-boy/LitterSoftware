@@ -243,7 +243,6 @@ static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
 
 void USART1_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize)
 {
-	
 	/* 复位 DMA Stream 寄存器 (用于调试目的) */
  	/* DMA_DeInit(USARTx_TX_DMA_STREAM); */
 

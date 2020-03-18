@@ -3,9 +3,9 @@
   * @file    main.c
   * @author  yueran
   * @version V1.0 裸机
-  * @date    2020-03-15
+  * @date    2020-03-16
   * @brief   无锡固废项目--大爪子
-  ******************************************************************************
+  *****************************************************************************
   * @attention
   *
   * 实验平台: STM32 F407VET6
@@ -50,15 +50,19 @@ int main(void)
 	
 	//初始值
 	target.x[0] = 13000;
-	target.y[0] = 4000;
-	target.z[0] = 1600;
-	origin.x[0] = 7900;
-	origin.y[0] = 4000;
-	origin.z[0] = 1700;	
+	target.y[0] = 4000; 
+	target.z[0] = 1600; 
+	origin.x[0] = 7900; 
+	origin.y[0] = 4000; 
+	origin.z[0] = 1700; 
 	
 	while(1) 
   { 
-		BigCarRunning();
+		if(task_tim.time_100ms >= 200)
+		{
+			
+		}
+		BigCarTask();
 		delay_ms(200);
 	}	 
 }

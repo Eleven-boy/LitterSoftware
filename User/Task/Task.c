@@ -22,6 +22,10 @@ uint8_t Big_Claw_Up_Delay_Flag = 0;//打开定时器标志位
 int64_t Big_Claw_Up_Delay_Pool = 0;
 uint8_t Big_Claw_Up_Delay_Pool_Flag = 0;
 
+void BigCarTask(void)
+{
+	BigCarRunning();
+}
 void BigCarRunning(void)
 {
 	/*big car starts running!*/
@@ -95,7 +99,6 @@ void VerticalMoving(float z)
 	//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
 	DownPaw(z);
 	RequestStop(BIG_CLAW);//请求大爪433停止发送数据
-
 }
 //竖直降落到初始位置
 void VerticalMoveOrigin(float z)
@@ -649,6 +652,78 @@ void DownPaw(float z)
 	}	
 	
 }
+//大行车自检状态
+void SelfCheckStatus(void)
+{
+	uint8_t count1=0;
+	uint8_t count2=0;
+	
+	RequestStart(BIG_CAR);//请求大车433发送数据
+	
+	while ((laser.dis6<=0)||(laser.dis7<=0))//判断大行车数据是否正常
+	{
+		RequestStart(BIG_CAR); //请求大车433发送数据	
+		
+		count1++;
+		if(count1>10)//请求次数大于10次还没有得到正确数据，可能是数据传输链路有问题，需要检查
+		{
+			break;
+		}
+	}
+	if(count1<=10)//数据正常
+	{
+		/*
+			数据正常，上传数据，此段函数需要补充
+		*/
+		
+		//判断行车位置
+		if((abs(laser.dis6-ORIGIN_X)<200)&&(abs(laser.dis7-ORIGIN_Y)<200))
+		{
+			//(x,y)坐标在初始位置，继续判断z轴数据是否在初始位置附近
+			RequestStop(BIG_CAR); //请求大车433停止发送数据	
+			RequestStart(BIG_CLAW); //请求大爪433发送数据	
+			
+			while (laser.dis1<=0)//判断大爪上传数据是否正常
+			{
+				count2++;
+				if(count2>10)//请求次数大于10次还没有得到正确数据，可能是数据传输链路有问题，需要检查
+				{
+					break;
+				}
+				for (uint8_t i = 0; i < 5; i++)
+				{
+					RequestStop(BIG_CAR); //请求大车433停止发送数据	
+					RequestStart(BIG_CLAW); //请求大抓433发送数据	
+				}			 
+			}		
+			if(abs(laser.dis1-ORIGIN_Z)<200)
+			{
+				/*不需要动*/
+				RequestStop(BIG_CLAW); //请求大爪433停止发送数据	
+			}
+			else
+			{
+				VerticalMoveOrigin(ORIGIN_Z);//移动到初始位置
+			}
+		}
+		else
+		{
+			//继续判断大爪子在在垃圾池上方还是平台上方
+			if(laser.dis6<ADD_X)//在平台上方
+			{		
+				RisePawFromBurnPool();
+				HorizontalMoving(ORIGIN_X,ORIGIN_Y);
+				VerticalMoveOrigin(ORIGIN_Z);
+			}
+			else//在垃圾池上方
+			{
+				RisePawFromLitterPool();
+				HorizontalMoving(ORIGIN_X,ORIGIN_Y);
+				VerticalMoveOrigin(ORIGIN_Z);				
+			}			
+		}
+	}
+}
 //复位标志位
 void ResetFlagBit(void)
 {
@@ -657,5 +732,3 @@ void ResetFlagBit(void)
 	 DOWN_BIT=0;
 	 UP_BIT=0;	
 }
-
-

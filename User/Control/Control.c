@@ -24,7 +24,6 @@ void control_task(void)
 	  task_tim.time_1ms = 0;
 		
 	}	
-	
   if(task_tim.time_2ms >= 4)
 	{
 	  task_tim.time_2ms -= 4;

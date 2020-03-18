@@ -230,7 +230,6 @@ void USARTx_IRQHandler(void)
 		DMACLEAR;
 		DMA_Cmd(USART_TX_DMA, DISABLE); 
 	}
-
 }
 
 #define BYTE0(dwTemp)       (*(char *)(&dwTemp))      

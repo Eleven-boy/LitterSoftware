@@ -1,2 +1,8 @@
 任务一：串口接收数据
 任务二：显示数据
+
+2020/03/18
+	(1)task.c  新增自检函数：void SelfCheckStatus(void)
+	(2)task.h  #define ORIGIN_X            7900     //大爪子初始X位置
+               #define ORIGIN_Y            4000     //大爪子初始Y位置
+               #define ORIGIN_Z            1700     //大爪子初始Z位置
