@@ -11,11 +11,28 @@
 POSITION origin;//起始位置
 POSITION target;//目标位置 
 
+extern uint8_t WaitFlag;
+
 uint8_t X_MOVE_BIT=0;
 uint8_t Y_MOVE_BIT=0;
 uint8_t DOWN_BIT=0;
 uint8_t UP_BIT=0;
- 
+//0:数据不正常，1:数据正常
+uint8_t DataCorrect = 0; 
+//半自动状态下的运行步骤 1:停止,2:X,3:Y,4:上,4:下,6:抓,7:松,
+uint8_t HTaskModeFlag = 0;
+//大行车反向停止标志位
+uint8_t ReverseStop = 0;
+//反向时间
+int ReverseTime = 0; 
+//反向操作次数
+uint8_t ReverseCount = 0;
+
+//大行车点动标志位
+uint8_t PointMove = 0;
+//电动时间
+int PointMoveTime = 0; 
+
 int64_t Big_Claw_Up_Delay = 0;//延时时间 S
 uint8_t Big_Claw_Up_Delay_Flag = 0;//打开定时器标志位
 
@@ -52,7 +69,6 @@ void BigCarRunning(void)
 //水平移动
 void HorizontalMoving(float x,float y)
 {
-	uint8_t count=0;
 	
 	RequestStop(BIG_CLAW); //请求大爪433停止发送数据	
 	RequestStart(BIG_CAR); //请求大车433发送数据	
@@ -65,6 +81,12 @@ void HorizontalMoving(float x,float y)
 				RequestStart(BIG_CAR); //请求大车433发送数据	
 		}
 	}
+//	if((0!=HTaskModeFlag)||(0==DataCorrect))
+//	{
+//		DataCommunicateManage(HTaskModeFlag);
+//	}
+//	else if(1==DataCorrect)//数据正常
+//	{}
 	//大行车X方向移动
 	XMoving(x);	
 	//大行车Y方向移动
@@ -391,102 +413,68 @@ void XMoving(float x)
 	if(abs(err_x)>2000)//偏差大于一定范围时，要移动	
 	{
 		err_x = laser.dis6 - x;    //24米
-		
 		//Now is moving to the X destination
-		if( (err_x<0) && (0==X_MOVE_BIT) )//大行车向南移动
+		if(err_x<0)//大行车向南移动
 		{
 			//大行车开始向南移动
 			CAR_SOUTH(ON);
-			while(err_x<(-2000))
-			{
-				//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-				delay_ms(100);    
-				err_x = laser.dis6 - x;    //24米
-			}
-			CAR_SOUTH(OFF);
-			//大行车反向停止
-			for(uint8_t i=0;i<2;i++)
-			{
-				CAR_NORTH(ON);
-				for (uint8_t i = 0; i < 10; i++)
-				{
-						//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-						delay_ms(100);
-						err_x = laser.dis6 - x;    //24米 
-				}				
-				CAR_NORTH(OFF);
-				delay_ms(1000);
-			}
-			X_MOVE_BIT = 1;
-			//大行车开始向南点动
+			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);  		
 		}
-		else if( (err_x>0) && (0==X_MOVE_BIT) )//大行车开始向北运动
+		else if(err_x>0)//大行车开始向北运动
 		{
 			//大行车开始向北运动
-			CAR_NORTH(ON);
-			while(err_x>2000)
-			{
-					//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-					delay_ms(100); 
-					err_x = laser.dis6 - x;    //24米             
-			}  			
-			CAR_NORTH(OFF);
-			//大行车反向制动
-			for (uint8_t i = 0; i < 2; i++)//大行车反向制动
-			{
-					CAR_SOUTH(ON);
-					for (uint8_t j = 0; j < 10; j++)
-					{
-							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-							delay_ms(100); 
-							err_x = laser.dis6 - x;    //24米
-					}
-					CAR_SOUTH(OFF);
-					delay_ms(1000);
-			}	
-			X_MOVE_BIT = 1;
-		}
-		delay_ms(100);			
-	}
-	
+			CAR_NORTH(ON);		
+			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);	
+		}		
+	}	
 	//大行车X方向开始点动
-	if((abs(err_x)<2000)||(1==X_MOVE_BIT))//大行车X方向点动模式
-	{
-		CAR_SOUTH(OFF);
-		CAR_NORTH(OFF);
+	else if(abs(err_x)<2000)//大行车X方向点动模式
+	{		
 		if(err_x<0)//大行车向南点动
 		{
-			while(err_x<(-200))
+			//大行车反向停止
+			if((err_x<(-200))&&(ReverseCount<2))
 			{
-					CAR_SOUTH(ON);
-					for (uint8_t i = 0; i < 8; i++)
-					{
-							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-							delay_ms(100); 
-							err_x = laser.dis6 - x;    //24米
-					}
-					CAR_SOUTH(OFF);
-					delay_ms(1000); 
+				RevStop(err_x);			
 			}
-			CAR_SOUTH(OFF);			
+			else if((err_x<(-200))&&(ReverseCount>=2))//大行车向南点动
+			{
+				DotMove(err_x,0.0f);
+			}
+		  else/*X方向移动结束*/
+			{
+				CAR_SOUTH(OFF);
+				HTaskModeFlag = 0;
+				WaitFlag = 0;
+				
+				ReverseCount = 0;
+				PointMove = 0;
+				PointMoveTime = 0;
+			}
 		}
 		else if(err_x>=0)//大行车向北点动
 		{
-			while(err_x>200)
+			//大行车反向制动			
+			if((err_x>200)&&(ReverseCount<2))
 			{
-					CAR_NORTH(ON);
-					for (uint8_t i = 0; i < 8; i++)
-					{
-							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-							delay_ms(100); 
-							err_x = laser.dis6 - x;    //24米  
-					}
-					CAR_NORTH(OFF);
-					delay_ms(500);
+				RevStop(err_x);
+			}			
+			else if((err_x>200)&&((ReverseCount)>=2))//大行车向北点动
+			{
+				DotMove(err_x,0.0f);
 			}
-			CAR_NORTH(OFF);			
+			else/*X方向移动结束*/
+			{
+				CAR_NORTH(OFF);						
+				HTaskModeFlag = 0;
+				WaitFlag = 0;
+				
+				ReverseCount = 0;
+				PointMove = 0;
+				PointMoveTime = 0;
+			}
+			
 		}
-		X_MOVE_BIT = 2; 
 	}
 }
 //单独Y方向运动
@@ -494,80 +482,57 @@ void YMoving(float y)
 {
 	float err_y = 0;
 	err_y = laser.dis7-y;
+	
 	//大行车Y方向移动
 	if(abs(err_y)>2000)//大行车Y方向移动
-	{
-		err_y = laser.dis7 - y;    //12米
-		
+	{	
 		//Now is moving to the Y destnation
-		if ((err_y>0)&&(0==Y_MOVE_BIT)&&(2==X_MOVE_BIT))//大行车向东运动
+		if ((err_y>0))//大行车向东运动
 		{
 			CAR_EAST(ON); 
-			while(abs(err_y)>2000)
-			{
-				//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-				delay_ms(100); 
-				err_y = laser.dis7 - y;    //12米
-			}
-			Y_MOVE_BIT = 1;
-			CAR_EAST(OFF); 
+			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}
-		else if ((err_y<0) && (0==Y_MOVE_BIT)&&(2==X_MOVE_BIT))//大行车向西运动
+		else if ((err_y<0))//大行车向西运动
 		{
 			CAR_WEST(ON);
-			while(abs(err_y)>2000)
-			{
-				//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-				delay_ms(100); 
-				err_y = laser.dis7 - y;    //12米		
-			}
-			Y_MOVE_BIT = 1;
-			CAR_WEST(OFF);
+			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}	
-		delay_ms(100);
 	}
 	//大行车Y方向点动
-	if ((abs(err_y)<2000)||(1==Y_MOVE_BIT))//大行车Y方向点动
-	{
-		CAR_WEST(OFF);
-		CAR_EAST(OFF);
-		while ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10))//等待mpu6050数据稳定
-		{
-			 
-		}   		
+	else if ((abs(err_y)<2000))//大行车Y方向点动
+	{	
 		if(err_y<0)//大行车向西点动
 		{
-			while(err_y<(-200))
+			if(err_y<(-200))
 			{
-					CAR_WEST(ON);
-					for (uint8_t i = 0; i < 8; i++)
-					{
-							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-							delay_ms(100); 
-							err_y = laser.dis7 - y;    //12米
-					}
-					CAR_WEST(OFF);
-					delay_ms(500);
+				DotMove(0,err_y);
 			}
-			CAR_WEST(OFF);
+			else//Y方向移动结束
+			{
+				CAR_WEST(OFF);
+				HTaskModeFlag = 0;
+				WaitFlag = 0;
+				
+				PointMove = 0;
+				PointMoveTime = 0;						
+			}
 		}
-		else if(err_y>0)
+		else if(err_y>0)//大行车向东点动
 		{
-			while(err_y>200)
+			if(err_y>200)
 			{
-					CAR_EAST(ON);
-					for (uint8_t i = 0; i < 8; i++)
-					{
-							//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
-							delay_ms(100); 
-							err_y = laser.dis7 - y;    //12米
-					}
-					CAR_EAST(OFF);
-					delay_ms(500);
+				DotMove(0,err_y);
 			}
-			CAR_EAST(OFF);		
+			else//Y方向移动结束
+			{
+				CAR_EAST(OFF);	
+				HTaskModeFlag = 0;
+				WaitFlag = 0;
+				
+				PointMove = 0;
+				PointMoveTime = 0;				
+			}
 		}
-		Y_MOVE_BIT = 2; 
 	}	
 }
 //爪子下降程序（依靠爪子上激光）
@@ -576,7 +541,6 @@ void DownPaw(float z)
 	float paw_err=0; 
 	float paw_nowDis = 0;
 	float paw_err_last=0;
-	uint8_t count = 0;
 	uint8_t same_dis_count=0;
 	
 	paw_err = laser.dis1 - z;
@@ -658,6 +622,7 @@ void SelfCheckStatus(void)
 	uint8_t count1=0;
 	uint8_t count2=0;
 	
+  RelayOn();//打开遥控器
 	RequestStart(BIG_CAR);//请求大车433发送数据
 	
 	while ((laser.dis6<=0)||(laser.dis7<=0))//判断大行车数据是否正常
@@ -723,6 +688,162 @@ void SelfCheckStatus(void)
 			}			
 		}
 	}
+	ResetFlagBit();
+	RelayOff();//关闭遥控器 
+}
+//数据通讯管理
+void DataCommunicateManage(uint8_t task_mode)
+{
+	if((2==task_mode)||(3==task_mode)||(4==task_mode))//X,Y,上升
+	{	
+		if ((laser.dis6<=0)||(laser.dis7<=0)||(laser.dis5<=0))//判断大行车数据是否正常
+		{
+			DataCorrect = 0;
+			RequestStop(BURN_POOL); //请求料池433停止发送数据	
+			RequestStop(BIG_CLAW);  //请求大爪433停止发送数据
+			RequestStart(BIG_CAR);  //请求大车433发送数据	
+		}	
+		else
+			DataCorrect = 1;
+	}
+	else if(5==task_mode)
+	{
+		if (laser.dis1<=0)//判断大爪子数据是否正常
+		{
+			DataCorrect = 0;
+			RequestStop(BURN_POOL);  //请求料池433停止发送数据	
+			RequestStop(BIG_CAR);    //请求大车433停止发送数据
+			RequestStart(BIG_CLAW);  //请求大爪433发送数据	
+		}	
+		else
+			DataCorrect = 1;	
+	}
+}
+//半自动单独X方向移动
+void HXMoxing(float x)
+{
+	if((0!=HTaskModeFlag)||(0==DataCorrect))
+	{
+		DataCommunicateManage(HTaskModeFlag);
+	}
+	else if(1==DataCorrect)//数据正常
+	{
+		
+		XMoving(x);
+	}
+}
+//反向停止
+void RevStop(float err)
+{
+	if(err>0)
+	{
+		//大行车向南反向制动	
+		if(ReverseStop == 0)
+		{
+			CAR_NORTH(OFF);
+			ReverseStop=1;	       				
+		}
+		else if(ReverseStop==1)
+		{
+			if(ReverseTime<=10)//1s开
+			{				
+				CAR_SOUTH(ON);				
+			}
+			else
+			{
+				ReverseStop++;
+				ReverseTime = 0;
+			}	
+		}
+		else if(ReverseStop==0)
+		{
+			if(ReverseTime<=2)//0.2s停
+			{				
+				CAR_SOUTH(OFF);				
+			}
+			else
+			{
+				ReverseStop--;
+				ReverseTime = 0;
+				ReverseCount++;
+			}					
+		}					
+	}
+	//大行车向北反向制动
+	else
+	{
+		//大行车反向停止
+		if(ReverseStop == 0)
+		{
+			CAR_SOUTH(OFF);
+			ReverseStop=1;	       				
+		}
+		else if(ReverseStop==1)
+		{
+			if(ReverseTime<=10)//1s开
+			{				
+				CAR_NORTH(ON);				
+			}
+			else
+			{
+				ReverseStop++;
+				ReverseTime = 0;
+			}	
+		}
+		else if(ReverseStop==0)
+		{
+			if(ReverseTime<=2)//0.2s停
+			{				
+				CAR_NORTH(OFF);				
+			}
+			else
+			{
+				ReverseStop--;
+				ReverseTime = 0;
+				ReverseCount++;
+			}					
+		}			
+	}
+}
+//大行车点动
+void DotMove(float err_x,float err_y)
+{
+	if(PointMove == 0)
+	{
+		ReverseStop = 0;
+		ReverseTime = 0;
+		PointMove = 1;
+	}
+	else if(PointMove == 1)
+	{
+		if(PointMoveTime<10)
+		{
+			if(err_x>0)	CAR_NORTH(ON);
+			else if(err_x<0) CAR_SOUTH(ON);
+			else if(err_y>0) CAR_EAST(ON);
+			else if(err_y<0) CAR_WEST(ON);				
+		}
+		else
+		{
+			PointMove++;
+			PointMoveTime=0;
+		}
+	}
+	else if(PointMove == 2)
+	{
+		if(PointMoveTime<10)
+		{
+			if(err_x>0)	CAR_NORTH(OFF);
+			else if(err_x<0) CAR_SOUTH(OFF);
+			else if(err_y>0) CAR_EAST(OFF);
+			else if(err_y<0) CAR_WEST(OFF);	
+		}
+		else
+		{
+			PointMove--;
+			PointMoveTime=0;
+		}				
+	}	
 }
 //复位标志位
 void ResetFlagBit(void)

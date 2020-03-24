@@ -33,6 +33,13 @@
 
 #define abs(x)  ((x<0)?(-x):x)       //求x的绝对值
 
+extern uint8_t DataCorrect;
+extern uint8_t HTaskModeFlag;
+extern uint8_t ReverseStop;
+extern int ReverseTime;
+extern uint8_t PointMove;
+extern int PointMoveTime;
+
 extern int64_t Big_Claw_Up_Delay;//延时时间 S
 extern uint8_t Big_Claw_Up_Delay_Flag;//打开定时器标志位
 
@@ -54,6 +61,9 @@ void XMoving(float x);
 void YMoving(float y);
 void DownPaw(float z);
 void SelfCheckStatus(void);
+void DataCommunicateManage(uint8_t task_mode);
+void RevStop(float err);
+void DotMove(float err_x,float err_y);
 void ResetFlagBit(void);
 #endif /* __TASK_H */
 

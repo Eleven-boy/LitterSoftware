@@ -6,8 +6,23 @@
 #include "beep.h"
 #include "task.h"
 
+ /*
+ *************************************************************************
+ *                          全局变量
+ *************************************************************************  
+ */
+
+
+
 Task_loop_t task_tim;
-										 
+
+void ChoseTask(uint8_t choice)
+{
+  //TaskModeFlag = choice;
+}
+
+
+
 void control_task(void)
 {
 
@@ -19,30 +34,33 @@ void control_task(void)
 	task_tim.time_100ms++;	
 	task_tim.time_1000ms++;	
 	
-  if(task_tim.time_1ms >= 2)
-	{
-	  task_tim.time_1ms = 0;
-		
-	}	
-  if(task_tim.time_2ms >= 4)
-	{
-	  task_tim.time_2ms -= 4;
 
-	}
-	else if(task_tim.time_5ms >= 10)
+
+	if(task_tim.time_5ms >= 10)
 	{
 	  task_tim.time_5ms -= 10;
+
+	}
+	else if(task_tim.time_10ms >= 20)
+	{
+	  task_tim.time_10ms -= 20;
 
 	}
 	else if(task_tim.time_25ms >= 50)
 	{
 	  task_tim.time_25ms -= 50;
-
 	}
 	else if(task_tim.time_100ms >= 200)
 	{
 	  task_tim.time_100ms -= 200;
-
+		if((ReverseStop == 1)||(ReverseStop == 2))
+		{
+			ReverseTime++;
+		}
+		if((PointMove == 1)||(PointMove == 2))
+		{
+			PointMoveTime++;
+		}
 	}
 	else if(task_tim.time_1000ms >= 2000)
 	{

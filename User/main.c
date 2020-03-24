@@ -35,6 +35,15 @@
 #include "uart4.h"
 #include "task.h"
 #include "Control.h"	
+
+ /*
+ *************************************************************************
+ *                          全局变量
+ *************************************************************************  
+ */
+ //等待标志位  上位机数据传来时 WaitFlag = 1；否则WaitFlag = 0。
+ uint8_t WaitFlag = 0;
+
  /*
  *************************************************************************
  *                        函数声明
@@ -43,6 +52,7 @@
 void BSP_Init(void);
 int main(void)
 {	
+	//uint8_t Choice = 0;
 	SysTick_Init();                 //系统时钟初始化
   BSP_Init();                     //相关硬件初始化
 	
@@ -55,15 +65,55 @@ int main(void)
 	origin.x[0] = 7900; 
 	origin.y[0] = 4000; 
 	origin.z[0] = 1700; 
+
+  SelfCheckStatus();//开机启动自检程序
 	
 	while(1) 
   { 
-		if(task_tim.time_100ms >= 200)
+		if(task_tim.time_10ms >= 20)//运行任务每次10ms
+		{
+			if(1 == WaitFlag)//已收到上位机传来数据
+			{				
+				//ChoseTask(Choice);
+				HTaskModeFlag=0;
+				WaitFlag = 2;//已收到指令正在运行
+			}
+			else
+			{
+				/*等待上位机发送命令*/
+			}
+			
+			//根据指令选择要执行的任务
+			switch(HTaskModeFlag)
+			{
+				case 1: //停止
+					RelayOff();
+				  HTaskModeFlag=0;
+					break;
+				case 2: //X
+					XMoving(target.x[0]);
+					break;
+				case 3: //Y
+					YMoving(target.y[0]);
+					break;
+				case 4: //上升
+					break;				
+				case 5: //下降
+					break;
+				case 6: //抓
+					break;	
+				case 7: //松
+					break;				
+				default:
+					break;
+			}
+
+		}
+		else if(task_tim.time_100ms >= 200)
 		{
 			
 		}
 		BigCarTask();
-		delay_ms(200);
 	}	 
 }
 
@@ -80,3 +130,5 @@ void BSP_Init(void)
 	UART4_Init(115200);	            //UART4初始化(用于调试用)
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
 }
+
+
