@@ -97,12 +97,16 @@ int main(void)
 					YMoving(target.y[0]);
 					break;
 				case 4: //иоиЩ
+					
 					break;				
 				case 5: //об╫╣
+					
 					break;
 				case 6: //в╔
+					
 					break;	
 				case 7: //ки
+					
 					break;				
 				default:
 					break;

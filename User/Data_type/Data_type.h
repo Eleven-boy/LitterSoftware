@@ -13,13 +13,14 @@
  *******************************************************/
  //单点激光
 typedef struct{
-	float dis1;
+	float dis1;//大爪子往下射的激光
 	float dis2;
 	float dis3;
 	float dis4;
 	float dis5;
 	float dis6;
 	float dis7;
+	float dis8;//大爪子往上射的激光
 	
 	float last_dis1;
 	float last_dis2;
@@ -28,6 +29,7 @@ typedef struct{
 	float last_dis5;
 	float last_dis6;
 	float last_dis7;
+	float last_dis8;
 		
 	float sampleval1;
 	float sampleval2;
@@ -36,6 +38,7 @@ typedef struct{
 	float sampleval5;
 	float sampleval6;
 	float sampleval7;
+	float sampleval8;
 }Laser;
 extern Laser laser;
 

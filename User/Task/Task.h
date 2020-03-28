@@ -29,7 +29,9 @@
 #define BIG_CAR_X_OFFSET  2000
 #define BURN_POOL_X  4600            //大行车停留在料坑上方时x坐标
 #define BURN_POOL_Y  4400            //大行车停留在料坑上方时y坐标
-
+#define BURN_POOL_DZ  5000            //大行车在焚料池上方下放时上面激光剧顶部距离
+#define BURN_POOL_UZ  3000            //大行车在焚料池上方上升时上面激光剧顶部距离
+#define PLATFORM_UZ  3000            //大行车在五楼平台上方上升时上面激光剧顶部距离
 
 #define abs(x)  ((x<0)?(-x):x)       //求x的绝对值
 
@@ -55,15 +57,22 @@ void VerticalMoveOrigin(float z);
 void ClosePaw(void);
 void ReleasePaw(void);
 void RisePawFromBurnPool(void);
+void RisePawFromPlatform(void);
 void RisePawFromLitterPool(void);
-void LowerClawtoPool(void);
+void LowerClawtoBurnPool(void);
 void XMoving(float x);
 void YMoving(float y);
-void DownPaw(float z);
+void UpPawFromBurnPool(float z);
+void UpPawFromPlatform(float z);
+void UpPawFromLitterPool(float z);
+void DownPawToBurnPool(float z);
+void DownPawToLitterPool(float z);
+void DownPawToPlatform(float z);
 void SelfCheckStatus(void);
 void DataCommunicateManage(uint8_t task_mode);
 void RevStop(float err);
-void DotMove(float err_x,float err_y);
+void HorizontalDotMove(float err_x,float err_y);
+void VerticalDotMove(float err_z);
 void ResetFlagBit(void);
 #endif /* __TASK_H */
 

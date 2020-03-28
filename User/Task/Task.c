@@ -8,6 +8,9 @@
  *                       全局变量
  *************************************************************************  
  */
+ 
+ 
+
 POSITION origin;//起始位置
 POSITION target;//目标位置 
 
@@ -17,6 +20,7 @@ uint8_t X_MOVE_BIT=0;
 uint8_t Y_MOVE_BIT=0;
 uint8_t DOWN_BIT=0;
 uint8_t UP_BIT=0;
+
 //0:数据不正常，1:数据正常
 uint8_t DataCorrect = 0; 
 //半自动状态下的运行步骤 1:停止,2:X,3:Y,4:上,4:下,6:抓,7:松,
@@ -57,7 +61,7 @@ void BigCarRunning(void)
 	
 	RisePawFromLitterPool();//向上提升爪子
 	HorizontalMoving(BURN_POOL_X,BURN_POOL_Y);//将爪子移至焚烧池正上方
-	LowerClawtoPool();//下降爪子至焚烧池
+	LowerClawtoBurnPool();//下降爪子至焚烧池
 	ReleasePaw(); 
 	ResetFlagBit(); 
 	
@@ -69,86 +73,71 @@ void BigCarRunning(void)
 //水平移动
 void HorizontalMoving(float x,float y)
 {
-	
-	RequestStop(BIG_CLAW); //请求大爪433停止发送数据	
-	RequestStart(BIG_CAR); //请求大车433发送数据	
-	
-	while ((laser.dis6<=0)||(laser.dis7<=0))//判断大行车数据是否正常
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
 	{
-		for (uint8_t i = 0; i < 3; i++)
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+	}
+	else if(1==DataCorrect)//数据正常
+	{
+		if(X_MOVE_BIT == 0)
 		{
-				RequestStop(BIG_CLAW); //请求大爪433停止发送数据
-				RequestStart(BIG_CAR); //请求大车433发送数据	
+			//大行车X方向移动
+			XMoving(x);			
+		}
+		else if(Y_MOVE_BIT == 0)
+		{
+			//大行车Y方向移动
+			YMoving(y);		
+		}
+		else
+		{
+			RequestStop(BIG_CAR); //请求大车433停止发送数据	
 		}
 	}
-//	if((0!=HTaskModeFlag)||(0==DataCorrect))
-//	{
-//		DataCommunicateManage(HTaskModeFlag);
-//	}
-//	else if(1==DataCorrect)//数据正常
-//	{}
-	//大行车X方向移动
-	XMoving(x);	
-	//大行车Y方向移动
-	YMoving(y);
-
-	RequestStop(BIG_CAR); //请求大车433停止发送数据	
 }
-//竖直移动
+//竖直移动去抓料
 void VerticalMoving(float z)
 {
-	uint8_t count = 0;
-
-	RequestStop(BIG_CAR); //请求大车433停止发送数据	
-	RequestStop(BURN_POOL); //请求料坑433停止发送数据	
-	RequestStart(BIG_CLAW); //请求大抓433发送数据		
-	
-	while (laser.dis1<=0)//判断大爪上传数据是否正常
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
 	{
-		count++;
-		if (count>5)
-		{   
-				for (uint8_t i = 0; i < 5; i++)
-				{
-					RequestStop(BIG_CAR); //请求大车433停止发送数据	
-					RequestStop(BURN_POOL); //请求料坑433停止发送数据	
-					RequestStart(BIG_CLAW); //请求大抓433发送数据	
-				}
-				count=0;
-		}		
-		delay_ms(100);
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+		laser.last_dis1 = laser.dis1; //先给laser.last_dis1初始化一个值
+		laser.last_dis8 = laser.dis8; //先给laser.last_dis8初始化一个值
 	}
-	//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-	DownPaw(z);
-	RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+	else if(1==DataCorrect)//数据正常
+	{
+		if(DOWN_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  DownPawToPlatform(z);		
+		}
+		else if(DOWN_BIT == 1)
+		{
+			RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+		}
+	}
 }
 //竖直降落到初始位置
 void VerticalMoveOrigin(float z)
 {
-	uint8_t count = 0;
-
-	RequestStop(BIG_CAR); //请求大车433停止发送数据	
-	RequestStop(BURN_POOL); //请求料坑433停止发送数据	
-	RequestStart(BIG_CLAW); //请求大抓433发送数据		
-	
-	while (laser.dis1<=0)//判断大爪上传数据是否正常
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
 	{
-		count++;
-		if (count>5)
-		{   
-				for (uint8_t i = 0; i < 5; i++)
-				{
-					RequestStop(BIG_CAR); //请求大车433停止发送数据	
-					RequestStop(BURN_POOL); //请求料坑433停止发送数据	
-					RequestStart(BIG_CLAW); //请求大抓433发送数据	
-				}
-				count=0;
-		}		
-		delay_ms(100);
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+		laser.last_dis1 = laser.dis1; //先给laser.last_dis1初始化一个值
+
 	}
-	//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-	DownPaw(z);
-	RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+	else if(1==DataCorrect)//数据正常
+	{
+		if(DOWN_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  DownPawToLitterPool(z);		
+		}
+		else if(DOWN_BIT == 1)
+		{
+			RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+		}
+	}
 }
 //合紧爪子
 void ClosePaw(void)
@@ -170,9 +159,28 @@ void ReleasePaw(void)
 		}
 		PAW_RELEASE(OFF);	
 }
-//从焚烧池或四楼平台抬升爪子
+//从焚烧池抬升爪子
 void RisePawFromBurnPool(void)
 {
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	{
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+		laser.last_dis8 = laser.dis8; //先给laser.last_dis8初始化一个值
+
+	}
+	else if(1==DataCorrect)//数据正常
+	{
+		if(UP_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  UpPawFromBurnPool(BURN_POOL_UZ);		
+		}
+		else if(DOWN_BIT == 1)
+		{
+			RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+		}
+	}		
+	/*
 	float err = 0.0f;
   uint8_t count=0;
   uint8_t stop_count=0;	
@@ -263,10 +271,35 @@ void RisePawFromBurnPool(void)
 	
 	RequestStop(BIG_CAR);//请求大车433停止发送数据
 	laser.dis5 = 0.0f;
+	*/
+}
+//从五楼平台抬升爪子
+void RisePawFromPlatform(void)
+{
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	{
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+		laser.last_dis1 = laser.dis1; //先给laser.last_dis1初始化一个值
+
+	}
+	else if(1==DataCorrect)//数据正常
+	{
+		if(UP_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  UpPawFromPlatform(PLATFORM_UZ);		
+		}
+		else if(DOWN_BIT == 1)
+		{
+			RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+		}
+	}
 }
 //从垃圾池抬升爪子
 void RisePawFromLitterPool(void)
 {
+	
+	/*
 	float err = 0.0;
 	uint8_t count=0;
 	uint8_t stop_count=0;	
@@ -351,10 +384,30 @@ void RisePawFromLitterPool(void)
 	//爪子上升结束
 	RequestStop(BIG_CAR);//请求大车433停止发送数据
 	laser.dis5 = 0.0f;
+	*/
 }
-//下放爪子至料坑
-void LowerClawtoPool(void)
+//下放爪子至焚料池
+void LowerClawtoBurnPool(void)
 {
+	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	{
+		DataCommunicateManage(HTaskModeFlag);//请求数据
+		laser.last_dis8 = laser.dis8; //先给laser.last_dis8初始化一个值
+
+	}
+	else if(1==DataCorrect)//数据正常
+	{
+		if(DOWN_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  DownPawToLitterPool(BURN_POOL_DZ);		
+		}
+		else if(DOWN_BIT == 1)
+		{
+			RequestStop(BIG_CLAW);//请求大爪433停止发送数据
+		}
+	}	
+/*
 	float err2 = 0.0,err3 = 0.0,err4 = 0.0;
 	uint8_t count = 0;	
 	
@@ -403,6 +456,7 @@ void LowerClawtoPool(void)
 	PAW_DOWN(OFF);
 	//爪子下降结束
 	RequestStop(BURN_POOL);
+*/
 }
 //单独X方向运动
 void XMoving(float x)
@@ -439,7 +493,7 @@ void XMoving(float x)
 			}
 			else if((err_x<(-200))&&(ReverseCount>=2))//大行车向南点动
 			{
-				DotMove(err_x,0.0f);
+				HorizontalDotMove(err_x,0.0f);
 			}
 		  else/*X方向移动结束*/
 			{
@@ -450,6 +504,7 @@ void XMoving(float x)
 				ReverseCount = 0;
 				PointMove = 0;
 				PointMoveTime = 0;
+				X_MOVE_BIT = 1;
 			}
 		}
 		else if(err_x>=0)//大行车向北点动
@@ -461,7 +516,7 @@ void XMoving(float x)
 			}			
 			else if((err_x>200)&&((ReverseCount)>=2))//大行车向北点动
 			{
-				DotMove(err_x,0.0f);
+				HorizontalDotMove(err_x,0.0f);
 			}
 			else/*X方向移动结束*/
 			{
@@ -472,6 +527,7 @@ void XMoving(float x)
 				ReverseCount = 0;
 				PointMove = 0;
 				PointMoveTime = 0;
+				X_MOVE_BIT = 1;
 			}
 			
 		}
@@ -505,7 +561,7 @@ void YMoving(float y)
 		{
 			if(err_y<(-200))
 			{
-				DotMove(0,err_y);
+				HorizontalDotMove(0,err_y);
 			}
 			else//Y方向移动结束
 			{
@@ -514,14 +570,15 @@ void YMoving(float y)
 				WaitFlag = 0;
 				
 				PointMove = 0;
-				PointMoveTime = 0;						
+				PointMoveTime = 0;	
+				Y_MOVE_BIT = 1;				
 			}
 		}
 		else if(err_y>0)//大行车向东点动
 		{
 			if(err_y>200)
 			{
-				DotMove(0,err_y);
+				HorizontalDotMove(0,err_y);
 			}
 			else//Y方向移动结束
 			{
@@ -530,91 +587,285 @@ void YMoving(float y)
 				WaitFlag = 0;
 				
 				PointMove = 0;
-				PointMoveTime = 0;				
+				PointMoveTime = 0;	
+				Y_MOVE_BIT = 1;							
 			}
 		}
 	}	
 }
-//爪子下降程序（依靠爪子上激光）
-void DownPaw(float z)
+//爪子上升程序（焚料池上上升），用大爪往上射的激光
+void UpPawFromBurnPool(float z)
 {
 	float paw_err=0; 
-	float paw_nowDis = 0;
 	float paw_err_last=0;
-	uint8_t same_dis_count=0;
+	static uint8_t same_dis_count=0;
 	
+	if (laser.dis8<0)//滤除偶尔出现的错误值
+	{
+		laser.dis8=laser.last_dis8;
+	}				
+	paw_err = laser.dis8 - z; 
+	laser.last_dis8 = laser.dis8;   
+	//大爪上升
+	/*情况1：正常情况运行*/
+	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
+ 	{
+		if(paw_err>=0)//大爪上升
+		{
+			PAW_UP(ON);	
+		}
+	}
+	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止上升
+	{
+		PAW_UP(OFF);	
+		HTaskModeFlag = 0;
+		WaitFlag = 0;
+		
+		UP_BIT = 1;//上升完成标志位置1
+	}	
+	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
+	if (abs(paw_err-paw_err_last)<100)//处理已经上升到限位的情况
+	{
+		same_dis_count = same_dis_count+1;
+		
+		if (same_dis_count>5)
+		{
+			PAW_UP(OFF);
+			same_dis_count=0;
+			HTaskModeFlag = 0;
+			WaitFlag = 0;
+			
+			UP_BIT = 1;
+		}	
+	}
+	else
+	{
+		same_dis_count=0;
+	}
+	paw_err_last=paw_err;			
+}
+//爪子上升程序（从五楼平台上升）
+void UpPawFromPlatform(float z)
+{
+	float paw_err=0; 
+	float paw_nowDis=0; 
+	float paw_err_last=0;
+	static uint8_t same_dis_count=0;
+	
+	if (laser.dis1<0)//滤除偶尔出现的错误值
+	{
+		laser.dis1=laser.last_dis1;
+	}				
+	paw_nowDis=laser.dis1;     
+	paw_err = paw_nowDis - z;    
+	laser.last_dis1 = laser.dis1;   
+		
+	paw_err = laser.dis1 - z;	
+	//大爪上升
+	/*情况1：正常情况运行*/
+	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
+ 	{
+		if(paw_err<=0)//大爪上升
+		{
+			PAW_UP(ON);	
+		}
+	}
+	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止上升
+	{
+		PAW_UP(OFF);	
+		HTaskModeFlag = 0;
+		WaitFlag = 0;
+		
+		UP_BIT = 1;//上升完成标志位置1
+	}	
+	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
+	if (abs(paw_err-paw_err_last)<100)//处理已经上升到限位的情况
+	{
+		same_dis_count = same_dis_count+1;
+		
+		if (same_dis_count>5)
+		{
+			PAW_UP(OFF);
+			same_dis_count=0;
+			HTaskModeFlag = 0;
+			WaitFlag = 0;
+			
+			UP_BIT = 1;
+		}	
+	}
+	else
+	{
+		same_dis_count=0;
+	}
+	paw_err_last=paw_err;			
+}
+//爪子上升程序（从料坑池上升）
+void UpPawFromLitterPool(float z)
+{
+
+}
+//爪子下降程序（下降到焚料池），用大爪往上射的激光
+void DownPawToBurnPool(float z)
+{
+	float paw_err=0; 
+	float paw_err_last=0;
+	static uint8_t same_dis_count=0;
+	
+	if (laser.dis8<0)//滤除偶尔出现的错误值
+	{
+		laser.dis8=laser.last_dis8;
+	}				
+	paw_err = laser.dis8 - z; 
+	laser.last_dis8 = laser.dis8;   
+
+	//大爪下降
+	/*情况1：正常情况运行*/
+	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪下降
+	{
+		if(paw_err<=0)//大爪下降
+		{
+			PAW_DOWN(ON);	
+		}
+	}
+	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止下降
+	{
+		PAW_DOWN(OFF);	
+		HTaskModeFlag = 0;
+		WaitFlag = 0;
+		
+		DOWN_BIT = 1;//下降完成标志位置1
+	}
+	/*情况2：在点动时爪子倾斜过大*/
+	if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
+	{
+		PAW_DOWN(OFF);
+		HTaskModeFlag = 0;
+		WaitFlag = 0;
+		
+		DOWN_BIT = 1;
+	} 		
+	/*情况3：爪子无法下降，但是绳索仍然下降*/
+	if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+	{
+		same_dis_count = same_dis_count+1;
+		
+		if (same_dis_count>5)
+		{
+			PAW_DOWN(OFF);
+			same_dis_count=0;
+			HTaskModeFlag = 0;
+			WaitFlag = 0;
+			
+			DOWN_BIT = 1;
+		}	
+	}
+	else
+	{
+		same_dis_count=0;
+	}
+	paw_err_last=paw_err;		
+}
+//爪子下降程序（下降到料坑抓料）
+void DownPawToLitterPool(float z)
+{
+//	还是用24米的吧
+	/*
+		大爪子下降抓料时下降的过程中要用到上下两个激光传感器，
+		在上半部分时，用往上打的激光传感器
+		在下半部分时，用往下打的激光传感器
+		但是中间有一段盲区
+	*/
+	if(laser.dis8>0 && laser.dis1<0)
+	{
+	
+	}
+	else if(laser.dis8<0 && laser.dis1<0)
+	{
+	
+	}
+	else if(laser.dis8<0 && laser.dis1>0)
+	{
+	
+	}
+}
+//爪子下降程序（下降到5楼平台）
+void DownPawToPlatform(float z)
+{
+	float paw_err=0; 
+	float paw_nowDis=0; 
+	float paw_err_last=0;
+	static uint8_t same_dis_count=0;
+	
+	if (laser.dis1<0)//滤除偶尔出现的错误值
+	{
+		laser.dis1=laser.last_dis1;
+	}				
+	paw_nowDis=laser.dis1;     
+	paw_err = paw_nowDis - z;    
+	laser.last_dis1 = laser.dis1;   
+		
 	paw_err = laser.dis1 - z;
 
 	//大爪下降
 	if(abs(paw_err)>1000)//大爪下降
 	{
-		if((paw_err>=0)&&(DOWN_BIT==0))//大爪下降
+		if(paw_err>=0)//大爪下降
 		{
-			PAW_DOWN(ON);
-			while(paw_err>1000)
-			{                 
-				//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-				delay_ms(100);   
-				if (laser.dis1<0)//滤除偶尔出现的错误值
-				{
-					laser.dis1=laser.last_dis1;
-				}				
-				paw_nowDis=laser.dis1;     
-				paw_err = paw_nowDis - z;    
-				laser.last_dis1 = laser.dis1;   
-			}			
-			PAW_DOWN(OFF);
-			DOWN_BIT=1;  //下降标志位
+			PAW_DOWN(ON);	
 		}
-		paw_err = laser.dis1 - z;
 	}
 	//大爪下降到指定高度，准备点动
-	if((abs(paw_err)<1000)&&(1==DOWN_BIT))//大爪下降到指定高度，准备点动
+	else if(abs(paw_err)<1000)//大爪下降到指定高度，准备点动
  	{
-		while ((abs(mpu.angle_x)>10)||(abs(mpu.angle_y)>10))//等待mpu6050数据稳定
+		/*情况1：正常情况运行*/
+		if(paw_err>200)//开始点动
 		{
-			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-			delay_ms(100);
+			VerticalDotMove(paw_err);
 		}
-		PAW_DOWN(ON);
-		while(paw_err>200)//开始点动
+		else//点动结束
 		{
-			PAW_DOWN(ON);
-			for (uint8_t i = 0; i < 10; i++)//点动程序
-			{
-				//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-				delay_ms(100);  
-				paw_nowDis=laser.dis1;        
-				paw_err = paw_nowDis - z;      
-			}
-			PAW_DOWN(OFF);		
-			delay_ms(500); 
-			if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
-			{
-					PAW_DOWN(OFF);
-					break;
-			} 
+			PAW_DOWN(OFF);			
+			HTaskModeFlag = 0;
+			WaitFlag = 0;
 			
-			if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
-			{
-					same_dis_count = same_dis_count+1;
-			}
-			else
-			{
-					same_dis_count=0;
-			}
+			PointMove = 0;
+			PointMoveTime = 0;	
+			DOWN_BIT = 1;
+		}
+		/*情况2：在点动时爪子倾斜过大*/
+		if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
+		{
+			PAW_DOWN(OFF);
+			HTaskModeFlag = 0;
+			WaitFlag = 0;
+			
+			PointMove = 0;
+			PointMoveTime = 0;	
+			DOWN_BIT = 1;
+		} 		
+		/*情况3：爪子无法下降，但是绳索仍然下降*/
+		if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+		{
+			same_dis_count = same_dis_count+1;
 			
 			if (same_dis_count>5)
 			{
-					PAW_DOWN(OFF);
-					break;
+				PAW_DOWN(OFF);
+				same_dis_count=0;
+				HTaskModeFlag = 0;
+				WaitFlag = 0;
+				
+				PointMove = 0;
+				PointMoveTime = 0;	
+				DOWN_BIT = 1;
 			}	
-			paw_err_last=paw_err;			
 		}
-		PAW_DOWN(OFF);
-		//大爪下降结束
+		else
+		{
+			same_dis_count=0;
+		}
+		paw_err_last=paw_err;				
 	}	
-	
 }
 //大行车自检状态
 void SelfCheckStatus(void)
@@ -708,7 +959,7 @@ void DataCommunicateManage(uint8_t task_mode)
 	}
 	else if(5==task_mode)
 	{
-		if (laser.dis1<=0)//判断大爪子数据是否正常
+		if (laser.dis1<=0 && laser.dis8<=0)//判断大爪子数据是否正常
 		{
 			DataCorrect = 0;
 			RequestStop(BURN_POOL);  //请求料池433停止发送数据	
@@ -806,7 +1057,7 @@ void RevStop(float err)
 	}
 }
 //大行车点动
-void DotMove(float err_x,float err_y)
+void HorizontalDotMove(float err_x,float err_y)
 {
 	if(PointMove == 0)
 	{
@@ -833,10 +1084,10 @@ void DotMove(float err_x,float err_y)
 	{
 		if(PointMoveTime<10)
 		{
-			if(err_x>0)	CAR_NORTH(OFF);
-			else if(err_x<0) CAR_SOUTH(OFF);
-			else if(err_y>0) CAR_EAST(OFF);
-			else if(err_y<0) CAR_WEST(OFF);	
+			if(err_x>0)	{CAR_NORTH(OFF);}
+			else if(err_x<0) {CAR_SOUTH(OFF);}
+			else if(err_y>0) {CAR_EAST(OFF);}
+			else if(err_y<0) {CAR_WEST(OFF);}
 		}
 		else
 		{
@@ -845,7 +1096,42 @@ void DotMove(float err_x,float err_y)
 		}				
 	}	
 }
-//复位标志位
+
+//大爪子点动
+void VerticalDotMove(float err_z)
+{
+	if(PointMove == 0)
+	{
+		PointMove = 1;
+	}
+	else if(PointMove == 1)
+	{
+		if(PointMoveTime<10)
+		{
+			if(err_z>0)	
+			{
+				PAW_DOWN(ON);		
+			}	
+		}
+		else
+		{
+			PointMove++;
+			PointMoveTime=0;
+		}
+	}
+	else if(PointMove == 2)
+	{
+		if(PointMoveTime<10)
+		{
+			if(err_z>0)	PAW_DOWN(OFF);
+		}
+		else
+		{
+			PointMove--;
+			PointMoveTime=0;
+		}				
+	}	
+}//复位标志位
 void ResetFlagBit(void)
 {
 	 X_MOVE_BIT=0;
