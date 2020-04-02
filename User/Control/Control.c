@@ -5,6 +5,7 @@
 #include "usart2.h"
 #include "beep.h"
 #include "task.h"
+#include "LCFunc.h"
 
  /*
  *************************************************************************
@@ -52,6 +53,7 @@ void control_task(void)
 	}
 	else if(task_tim.time_100ms >= 200)
 	{
+		
 	  task_tim.time_100ms -= 200;
 		if((ReverseStop == 1)||(ReverseStop == 2))
 		{
@@ -61,6 +63,16 @@ void control_task(void)
 		{
 			PointMoveTime++;
 		}
+		
+		if(CloseFlag == 1)
+		{
+			CloseDelay++;
+		}
+		if(OpenFlag == 1)
+		{
+			OpenDelay++;
+		}		
+		
 	}
 	else if(task_tim.time_1000ms >= 2000)
 	{

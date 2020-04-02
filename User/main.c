@@ -3,7 +3,7 @@
   * @file    main.c
   * @author  yueran
   * @version V1.0 裸机
-  * @date    2020-03-25
+  * @date    2020-03-30
   * @brief   无锡固废项目--大爪子
   *****************************************************************************
   * @attention
@@ -66,7 +66,7 @@ int main(void)
 	origin.y[0] = 4000; 
 	origin.z[0] = 1700; 
 
-  SelfCheckStatus();//开机启动自检程序
+  //SelfCheckStatus();//开机启动自检程序
 	
 	while(1) 
   { 
@@ -91,10 +91,10 @@ int main(void)
 				  HTaskModeFlag=0;
 					break;
 				case 2: //X
-					XMoving(target.x[0]);
+					//XMoving(target.x[0]);
 					break;
 				case 3: //Y
-					YMoving(target.y[0]);
+					//YMoving(target.y[0]);
 					break;
 				case 4: //上升
 					
