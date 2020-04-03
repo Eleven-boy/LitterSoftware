@@ -6,6 +6,7 @@
 #include "beep.h"
 #include "task.h"
 #include "LCFunc.h"
+#include "relay.h"
 
  /*
  *************************************************************************
@@ -73,6 +74,14 @@ void control_task(void)
 			OpenDelay++;
 		}		
 		
+		if(RelayOnflag>=0)
+		{
+			RelayOnflag++;
+		}
+		if(RelayOffflag>=0)
+		{
+			RelayOffflag++;
+		}
 	}
 	else if(task_tim.time_1000ms >= 2000)
 	{

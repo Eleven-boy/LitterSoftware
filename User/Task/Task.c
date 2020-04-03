@@ -18,8 +18,6 @@ POSITION target;//目标位置
 extern uint8_t WaitFlag;
 
 
-//半自动状态下的运行步骤 1:停止,2:X,3:Y,4:上,4:下,6:抓,7:松,
-uint8_t HTaskModeFlag = 0;
 
 
 

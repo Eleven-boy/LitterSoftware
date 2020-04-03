@@ -35,15 +35,16 @@
 #include "uart4.h"
 #include "task.h"
 #include "Control.h"	
-
+#include "Manual.h"
  /*
  *************************************************************************
  *                          全局变量
  *************************************************************************  
  */
- //等待标志位  上位机数据传来时 WaitFlag = 1；否则WaitFlag = 0。
- uint8_t WaitFlag = 0;
-
+//等待标志位  上位机数据传来时 WaitFlag = 1；否则WaitFlag = 0。
+uint8_t WaitFlag = 0;
+//运行模式 1：手动   2：半自动   3：全自动
+uint8_t Run_Mode = 0;
  /*
  *************************************************************************
  *                        函数声明
@@ -75,6 +76,7 @@ int main(void)
 			if(1 == WaitFlag)//已收到上位机传来数据
 			{				
 				//ChoseTask(Choice);
+				/*给Run_Mode赋值，指示何种运行模式*/
 				HTaskModeFlag=0;
 				WaitFlag = 2;//已收到指令正在运行
 			}
@@ -83,33 +85,45 @@ int main(void)
 				/*等待上位机发送命令*/
 			}
 			
-			//根据指令选择要执行的任务
-			switch(HTaskModeFlag)
+			
+			if(1==Run_Mode)//手动
 			{
-				case 1: //停止
-					RelayOff();
-				  HTaskModeFlag=0;
-					break;
-				case 2: //X
-					//XMoving(target.x[0]);
-					break;
-				case 3: //Y
-					//YMoving(target.y[0]);
-					break;
-				case 4: //上升
-					
-					break;				
-				case 5: //下降
-					
-					break;
-				case 6: //抓
-					
-					break;	
-				case 7: //松
-					
-					break;				
-				default:
-					break;
+				//根据指令选择要执行的任务
+				switch(HTaskModeFlag)
+				{
+					case 1: //停止
+//						RelayOff();
+//						HTaskModeFlag=0;
+						break;
+					case 2: //X
+						ManualXMoving(target.x[0]);
+						break;
+					case 3: //Y
+						ManualYMoving(target.y[0]);
+						break;
+					case 4: //上升
+						
+						break;				
+					case 5: //下降
+						
+						break;
+					case 6: //抓
+						ManualClose();
+						break;	
+					case 7: //松
+						ManualOpen();
+						break;				
+					default:
+						break;
+				}			
+			}
+			else if(2==Run_Mode)//半自动
+			{
+			
+			}
+			else if(3==Run_Mode)//全自动
+			{
+				
 			}
 
 		}
@@ -117,7 +131,6 @@ int main(void)
 		{
 			
 		}
-		BigCarTask();
 	}	 
 }
 

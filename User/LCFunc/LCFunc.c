@@ -77,7 +77,7 @@ void ClosePaw(void)
 		else
 		{
 			PAW_CLOSE(OFF);	
-			CloseFlag = 0;
+			CloseFlag = 2;
 			CloseDelay = 0;
 		}
 	}
@@ -103,7 +103,7 @@ void ReleasePaw(void)
 		else
 		{
 			PAW_RELEASE(OFF);	
-			OpenFlag = 0;
+			OpenFlag = 2;
 			OpenDelay = 0;
 		}
 	}
@@ -842,7 +842,7 @@ void SelfCheckStatus(void)
 //数据通讯管理
 void DataCommunicateManage(uint8_t task_mode)
 {
-	if((2==task_mode)||(3==task_mode)||(4==task_mode))//X,Y,上升
+	if(0==task_mode)//请求大行车433
 	{	
 		if ((laser.dis6<=0)||(laser.dis7<=0)||(laser.dis5<=0))//判断大行车数据是否正常
 		{
@@ -854,7 +854,7 @@ void DataCommunicateManage(uint8_t task_mode)
 		else
 			DataCorrect = 1;
 	}
-	else if(5==task_mode)
+	else if(1==task_mode)//请求大爪433
 	{
 		if (laser.dis1<=0 && laser.dis8<=0)//判断大爪子数据是否正常
 		{
@@ -865,19 +865,6 @@ void DataCommunicateManage(uint8_t task_mode)
 		}	
 		else
 			DataCorrect = 1;	
-	}
-}
-//半自动单独X方向移动
-void HXMoxing(float x)
-{
-	if((0!=HTaskModeFlag)||(0==DataCorrect))
-	{
-		DataCommunicateManage(HTaskModeFlag);
-	}
-	else if(1==DataCorrect)//数据正常
-	{
-		
-		XMoving(x);
 	}
 }
 /*
@@ -912,7 +899,7 @@ void RevStop(float err)
 				ReverseTime = 0;
 			}	
 		}
-		else if(ReverseStop==0)
+		else if(ReverseStop==2)
 		{
 			if(ReverseTime<=2)//0.2s停
 			{				
@@ -947,7 +934,7 @@ void RevStop(float err)
 				ReverseTime = 0;
 			}	
 		}
-		else if(ReverseStop==0)
+		else if(ReverseStop==2)
 		{
 			if(ReverseTime<=2)//0.2s停
 			{				
