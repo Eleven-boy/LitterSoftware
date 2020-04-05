@@ -36,6 +36,7 @@
 #include "task.h"
 #include "Control.h"	
 #include "Manual.h"
+#include "LCFunc.h"
  /*
  *************************************************************************
  *                          全局变量
@@ -45,6 +46,9 @@
 uint8_t WaitFlag = 0;
 //运行模式 1：手动   2：半自动   3：全自动
 uint8_t Run_Mode = 0;
+
+POSITION origin;//起始位置
+POSITION target;//目标位置 
  /*
  *************************************************************************
  *                        函数声明
@@ -55,9 +59,13 @@ int main(void)
 {	
 	//uint8_t Choice = 0;
 	SysTick_Init();                 //系统时钟初始化
-  BSP_Init();                     //相关硬件初始化
+  BSP_Init();                     //相关硬件初始化 
 	
-	RequestStop(ALL_DEV);//初始化请求所有433关闭发送
+	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
+	{
+		DataCommunicateManage(BIG_CLAW,1);//请求数据
+		DataCommunicateManage(BIG_CAR,1);//请求数据
+	}
 	
 	//初始值
 	target.x[0] = 13000;
@@ -65,7 +73,7 @@ int main(void)
 	target.z[0] = 1600; 
 	origin.x[0] = 7900; 
 	origin.y[0] = 4000; 
-	origin.z[0] = 1700; 
+	origin.z[0] = 1700;  
 
   //SelfCheckStatus();//开机启动自检程序
 	
@@ -77,54 +85,58 @@ int main(void)
 			{				
 				//ChoseTask(Choice);
 				/*给Run_Mode赋值，指示何种运行模式*/
-				HTaskModeFlag=0;
+				HTaskModeFlag = 0;
 				WaitFlag = 2;//已收到指令正在运行
 			}
-			else
+			else if(0 == WaitFlag)
 			{
 				/*等待上位机发送命令*/
 			}
-			
-			
-			if(1==Run_Mode)//手动
+			else if(2 == WaitFlag)//已收到指令正在运行
 			{
-				//根据指令选择要执行的任务
-				switch(HTaskModeFlag)
+				if(1==Run_Mode)//手动
 				{
-					case 1: //停止
-//						RelayOff();
-//						HTaskModeFlag=0;
-						break;
-					case 2: //X
-						ManualXMoving(target.x[0]);
-						break;
-					case 3: //Y
-						ManualYMoving(target.y[0]);
-						break;
-					case 4: //上升
-						
-						break;				
-					case 5: //下降
-						
-						break;
-					case 6: //抓
-						ManualClose();
-						break;	
-					case 7: //松
-						ManualOpen();
-						break;				
-					default:
-						break;
-				}			
-			}
-			else if(2==Run_Mode)//半自动
-			{
-			
-			}
-			else if(3==Run_Mode)//全自动
-			{
+					//根据指令选择要执行的任务
+					switch(HTaskModeFlag)
+					{
+						case 1: //停止断电
+	//						RelayOff();
+	//						HTaskModeFlag=0;
+							break;
+						case 2: //X
+							ManualXMoving(target.x[0]);
+							break;
+						case 3: //Y
+							ManualYMoving(target.y[0]);
+							break;
+						case 4: //上升
+							
+							break;				
+						case 5: //下降
+							
+							break;
+						case 6: //抓
+							ManualClose();
+							break;	
+						case 7: //松
+							ManualOpen();
+							break;				
+						default:
+							break;
+					}			
+				}
+				else if(2==Run_Mode)//半自动
+				{
 				
+				}
+				else if(3==Run_Mode)//全自动
+				{
+					
+				}
 			}
+			
+			
+
 
 		}
 		else if(task_tim.time_100ms >= 200)

@@ -12,8 +12,8 @@
  
  
 
-POSITION origin;//起始位置
-POSITION target;//目标位置 
+extern POSITION origin;//起始位置
+extern POSITION target;//目标位置 
 
 extern uint8_t WaitFlag;
 
@@ -51,11 +51,11 @@ void BigCarRunning(void)
 //水平移动
 void HorizontalMoving(float x,float y)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigCarDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigCarDataCorrect)//数据正常
 	{
 		if(X_MOVE_BIT == 0)
 		{
@@ -76,12 +76,12 @@ void HorizontalMoving(float x,float y)
 //竖直移动去抓料
 void VerticalMoving(float z)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		UpOrDown = 0;//0代表上半部，1代表下半部
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{
@@ -97,12 +97,12 @@ void VerticalMoving(float z)
 //竖直降落到初始位置
 void VerticalMoveOrigin(float z)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		laser.last_dis1 = laser.dis1; //先给laser.last_dis1初始化一个值
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{
@@ -120,13 +120,13 @@ void VerticalMoveOrigin(float z)
 //从焚烧池抬升爪子
 void RisePawFromBurnPool(void)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		laser.last_dis8 = laser.dis8; //先给laser.last_dis8初始化一个值
 
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(UP_BIT == 0)
 		{
@@ -234,13 +234,13 @@ void RisePawFromBurnPool(void)
 //从五楼平台抬升爪子
 void RisePawFromPlatform(void)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		laser.last_dis1 = laser.dis1; //先给laser.last_dis1初始化一个值
 
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(UP_BIT == 0)
 		{
@@ -256,12 +256,12 @@ void RisePawFromPlatform(void)
 //从垃圾池抬升爪子
 void RisePawFromLitterPool(void)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		UpOrDown = 1;//0代表上半部，1代表下半部
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(UP_BIT == 0)
 		{
@@ -363,13 +363,13 @@ void RisePawFromLitterPool(void)
 //下放爪子至焚料池
 void LowerClawtoBurnPool(void)
 {
-	if((0!=HTaskModeFlag)&&(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)&&(0==BigClawDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(HTaskModeFlag);//请求数据
+		DataCommunicateManage(HTaskModeFlag,1);//请求数据
 		laser.last_dis8 = laser.dis8; //先给laser.last_dis8初始化一个值
 
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigClawDataCorrect)//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{

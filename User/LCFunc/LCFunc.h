@@ -41,13 +41,15 @@ extern uint8_t DOWN_BIT;
 extern uint8_t UP_BIT;
 
 
-extern uint8_t DataCorrect;
+extern uint8_t BigCarDataCorrect; 
+extern uint8_t BigClawDataCorrect;
 extern uint8_t HTaskModeFlag;
 extern uint8_t ReverseStop;
 extern int ReverseTime;
 extern uint8_t PointMove;
 extern int PointMoveTime;
 extern uint8_t UpOrDown;
+extern uint8_t ErrorBigCar;
 //1：表示合拢
 extern uint8_t CloseFlag;
 //合拢延时
@@ -75,10 +77,12 @@ void DownPawToBurnPool(float z);
 void DownPawToLitterPool(float z);
 void DownPawToPlatform(float z);
 void SelfCheckStatus(void);
-void DataCommunicateManage(uint8_t task_mode);
+void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff);
 void RevStop(float err);
 void HorizontalDotMove(float err_x,float err_y);
 void VerticalDotMove(float err_z);
 void ResetFlagBit(void);
+void RequestStop(uint8_t dev);
+void RequestStart(uint8_t dev);
 #endif /* __TASK_H */
 

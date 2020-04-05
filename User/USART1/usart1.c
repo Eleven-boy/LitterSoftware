@@ -1,3 +1,6 @@
+/********************************************************************************************
+   串口1用于与大车通讯
+*********************************************************************************************/
 #include "usart1.h"
 #include "Data_type.h"
 
@@ -5,8 +8,6 @@
 #define U1_BUFFSIZESEND  100
 
 uint8_t u1_receive_buff[U1_BUFFSIZERECE] = {0};
-Laser laser;
-MPU6050 mpu; 
 uint8_t uart_cmd;
 /*
 ***************************************************************
@@ -333,27 +334,6 @@ void USARTx_IRQHandler(void)
 					sum=0;
 				}
 		 }
-		 else if(14==Uart1_Rec_Len)//BIG_CLAW
-		 {
-				if(0xBB == u1_receive_buff[0])
-				{
-					for(uint8_t i=0;i<13;i++)
-					{
-						sum += u1_receive_buff[i];
-					}
-					if(u1_receive_buff[13] == sum)
-					{
-						mpu.acc_z        = (u1_receive_buff[2]<<8|u1_receive_buff[1])/32767.0f*16.0f;
-						mpu.gyro_z       = (u1_receive_buff[4]<<8|u1_receive_buff[3])/32767.0f*2000.0f;	
-						mpu.angle_x      = (u1_receive_buff[6]<<8|u1_receive_buff[5])/32767.0f*180.0f;		
-						mpu.angle_y      = (u1_receive_buff[8]<<8|u1_receive_buff[7])/32767.0f*180.0f;		
-						mpu.angle_z      = (u1_receive_buff[10]<<8|u1_receive_buff[9])/32767.0f*180.0f;	
-						laser.sampleval1 = (u1_receive_buff[12]<<8|u1_receive_buff[11]);
-						laser.dis1      =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;
-					}
-					sum=0;					
-				}
-		 }
 		 else if(8==Uart1_Rec_Len)
 		 {
 				if(0xCC == u1_receive_buff[0])//BURN_POOL
@@ -404,7 +384,7 @@ void USARTx_IRQHandler(void)
 
 
 //向433发送请求指令
-void uart1_tx_task(unsigned char send_date[])
+void uart1_tx_task(unsigned char send_date[],uint8_t uart_cmd)
 {
 
 	send_date[3] = 0xAA;//请求数据
@@ -416,84 +396,27 @@ void uart1_tx_task(unsigned char send_date[])
 }
 
 
-//请求433停止发送指令
-//dev:设备号
-void RequestStop(uint8_t dev)
+//请求大车433停止发送指令
+void RequestStopToBigCar(void)
 {
-	uart_cmd=0;
-	int i = 0;
-	
-	switch(dev)
+	for ( int i = 0; i < 5; i++)
 	{
-		case BIG_CAR:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BIG_CAR]);
-							delay_ms(200);		
-					}	
-					break;
-		case BIG_CLAW:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BIG_CLAW]);
-							delay_ms(200);		
-					}	
-					break;		
-		case BURN_POOL:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BURN_POOL]);
-							delay_ms(200);		
-					}	
-					break;	
-		case ALL_DEV:
-			   	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BIG_CAR]);
-							delay_ms(200);
-							uart1_tx_task(send_request_to_xxx[BIG_CLAW]);
-							delay_ms(200);
-							uart1_tx_task(send_request_to_xxx[BURN_POOL]);
-							delay_ms(200);			
-					}	
-	}
-
+			uart1_tx_task(send_request_to_xxx[BIG_CAR],0);
+			delay_ms(200);		
+	}	
 }
 
-//请求433开始发送指令
-//dev:设备号
-void RequestStart(uint8_t dev)
+
+//请求大车433开始发送指令
+void RequestStartToBigCar(void)
 {
-	uart_cmd = 1;
-	int i = 0;
-	
-	switch(dev)
+	for (int i = 0; i < 5; i++)
 	{
-		case BIG_CAR:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BIG_CAR]);
-							delay_ms(200);		
-					}	
-					break;
-		case BIG_CLAW:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BIG_CLAW]);
-							delay_ms(200);		
-					}	
-					break;		
-		case BURN_POOL:
-				 	for (i = 0; i < 5; i++)
-					{
-							uart1_tx_task(send_request_to_xxx[BURN_POOL]);
-							delay_ms(200);		
-					}	
-					break;	
-	}
-
-
+			uart1_tx_task(send_request_to_xxx[BIG_CAR],1);
+			delay_ms(200);		
+	}	
 }
+
 #define BYTE0(dwTemp)       (*(char *)(&dwTemp))      
 #define BYTE1(dwTemp)       (*((char *)(&dwTemp) + 1))
 #define BYTE2(dwTemp)       (*((char *)(&dwTemp) + 2))

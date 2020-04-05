@@ -9,7 +9,6 @@
  *                       全局变量
  *************************************************************************  
  */
-
 extern uint8_t WaitFlag;
 
 
@@ -31,11 +30,11 @@ void ManualXMoving(float x)
 //------------------------------------------------------------
 	PowerOn();//行车上电
 //------------------------------------------------------------	
-	if((0!=HTaskModeFlag)||(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)||(0==BigCarDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(BIG_CAR);//修改		
+		DataCommunicateManage(BIG_CAR,1);//修改		
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigCarDataCorrect)//数据正常
 	{		
 		if(0==X_MOVE_BIT)
 		{
@@ -83,11 +82,11 @@ void ManualYMoving(float y)
 //------------------------------------------------------------
 	PowerOn();//行车上电
 //------------------------------------------------------------	
-	if((0!=HTaskModeFlag)||(0==DataCorrect))//数据不正常
+	if((0!=HTaskModeFlag)||(0==BigCarDataCorrect))//数据不正常
 	{
-		DataCommunicateManage(BIG_CAR);//修改		
+		DataCommunicateManage(BIG_CAR,1);//修改		
 	}
-	else if(1==DataCorrect)//数据正常
+	else if(1==BigCarDataCorrect)//数据正常
 	{
 		
 		if(0==Y_MOVE_BIT)

@@ -1,3 +1,6 @@
+/********************************************************************************************
+   串口2用于与大爪通讯
+*********************************************************************************************/
 #include "usart2.h"
 #include "bsp_led.h"
 #include "Data_type.h"
@@ -88,7 +91,7 @@ static void bsp_initUSART(u32 bound)
 	USART_Init(USARTx, &USART_InitStructure);
 	
 	USART_DMA_RxConfig();   //配置DMA
-//	USART_DMA_Tx_init(0,10);   //配置发送DMA
+	USART_DMA_Tx_init(0,10);   //配置发送DMA
 	USART_DMACmd(USARTx, USART_DMAReq_Rx, ENABLE);
 
 //	USART_DMACmd(USARTx, USART_DMAReq_Tx, ENABLE);
@@ -212,7 +215,7 @@ static void USART_RX_DMAReset(void)
  	DMA_SetCurrDataCounter(USART_RX_DMA,U2_BUFFSIZERECE);//DMA通道的DMA缓存的大小
  	DMA_Cmd(USART_RX_DMA, ENABLE); 
 }	
-
+int sum1;
 void USARTx_IRQHandler(void)
 {	
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       
@@ -221,7 +224,26 @@ void USARTx_IRQHandler(void)
 		 uint8_t Uart2_Rec_Len = U2_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			
 	   USART_RX_DMAReset();
 		 //数据帧处理
-		 
+		 if(14==Uart2_Rec_Len)//BIG_CLAW
+		 {
+				if(0xBB == u2_receive_buff[0])
+				{
+					for(uint8_t i=0;i<13;i++)
+					{
+						sum1 += u2_receive_buff[i];
+					}
+					if(u2_receive_buff[13] == sum1)
+					{
+						mpu.acc_z        = (u2_receive_buff[2]<<8|u2_receive_buff[1])/32767.0f*16.0f;
+						mpu.gyro_z       = (u2_receive_buff[6]<<8|u2_receive_buff[5])/32767.0f*180.0f;		
+						mpu.angle_y      = (u2_receive_buff[8]<<8|u2_receive_buff[7])/32767.0f*180.0f;		
+						mpu.angle_z      = (u2_receive_buff[10]<<8|u2_receive_buff[9])/32767.0f*180.0f;	
+						laser.sampleval1 = (u2_receive_buff[12]<<8|u2_receive_buff[11]);
+						laser.dis1      =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;
+					}
+					sum1=0;					
+				}
+		 }
 		 //直接在中断中接收处理数据 		
         				
 	}else if(USART_GetITStatus(USARTx, USART_IT_TC) == SET)
@@ -231,7 +253,37 @@ void USARTx_IRQHandler(void)
 		DMA_Cmd(USART_TX_DMA, DISABLE); 
 	}
 }
+//向433发送请求指令
+void uart2_tx_task(unsigned char send_date[],uint8_t uart_cmd)
+{
 
+	send_date[3] = 0xAA;//请求数据
+	send_date[4] = uart_cmd;
+	send_date[5] = send_date[4] + send_date[3];
+	// printf("send_date[0]= %d\n",send_date[0]);  
+
+	USART2_DMA_TxConfig((u32*)send_date,6);
+}
+
+//请求大爪433停止发送指令
+void RequestStopToBigClaw(void)
+{
+	for ( int i = 0; i < 5; i++)
+	{
+			uart2_tx_task(send_request_to_xxx[BIG_CLAW],0);
+			delay_ms(200);		
+	}	
+}
+
+//请求大爪433开始发送指令
+void RequestStartToBigClaw(void)
+{
+	for (int i = 0; i < 5; i++)
+	{
+			uart2_tx_task(send_request_to_xxx[BIG_CLAW],1);
+			delay_ms(200);		
+	}	
+}
 #define BYTE0(dwTemp)       (*(char *)(&dwTemp))      
 #define BYTE1(dwTemp)       (*((char *)(&dwTemp) + 1))
 #define BYTE2(dwTemp)       (*((char *)(&dwTemp) + 2))

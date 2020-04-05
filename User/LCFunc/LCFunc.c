@@ -9,6 +9,7 @@
 #include "LCFunc.h"
 #include "Data_type.h"
 #include "usart1.h"
+#include "usart2.h"
 #include "relay.h"
 
  /*
@@ -24,7 +25,8 @@ uint8_t DOWN_BIT=0;
 uint8_t UP_BIT=0;
 
 //0:数据不正常，1:数据正常
-uint8_t DataCorrect = 0; 
+uint8_t BigCarDataCorrect = 0; 
+uint8_t BigClawDataCorrect = 0;
 
 //大行车反向停止标志位
 uint8_t ReverseStop = 0;
@@ -49,6 +51,8 @@ int     CloseDelay = 0;
 uint8_t OpenFlag = 0;
 //打开延时
 int     OpenDelay = 0;
+//出错状态
+uint8_t ErrorBigCar = 0;
 
 int64_t Big_Claw_Up_Delay = 0;//延时时间 S
 uint8_t Big_Claw_Up_Delay_Flag = 0;//打开定时器标志位
@@ -831,40 +835,50 @@ void SelfCheckStatus(void)
 }
 /*
 *****************************************************************************************************************
-*                                     void DataCommunicateManage(uint8_t task_mode)(需要改正)
+*                                     DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 *
 *Description : 数据通讯管理，用于打开某一路上传激光数据
-*Arguments   : uint8_t task_mode：用于选择不同设备上的激光
+*Arguments   : uint8_t task_mode：用于选择不同设备上的激光 OnorOff:1代表on,0代表off
 *Returns     : none
 *Notes       : none
 *****************************************************************************************************************
 */
 //数据通讯管理
-void DataCommunicateManage(uint8_t task_mode)
+void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 {
-	if(0==task_mode)//请求大行车433
+	if(BIG_CAR==task_mode)//请求大行车433
 	{	
-		if ((laser.dis6<=0)||(laser.dis7<=0)||(laser.dis5<=0))//判断大行车数据是否正常
+		if(1==OnorOff)
 		{
-			DataCorrect = 0;
-			RequestStop(BURN_POOL); //请求料池433停止发送数据	
-			RequestStop(BIG_CLAW);  //请求大爪433停止发送数据
-			RequestStart(BIG_CAR);  //请求大车433发送数据	
-		}	
-		else
-			DataCorrect = 1;
+			if ((laser.dis6<=0)||(laser.dis7<=0)||(laser.dis5<=0))//判断大行车数据是否正常
+			{
+				BigCarDataCorrect = 0;
+				RequestStart(BIG_CAR);  //请求大车433发送数据	
+			}	
+			else
+				BigCarDataCorrect = 1;	
+		}
+		else if(0==OnorOff)
+		{
+			RequestStop(BIG_CAR);
+		}
 	}
-	else if(1==task_mode)//请求大爪433
+	else if(BIG_CLAW==task_mode)//请求大爪433
 	{
-		if (laser.dis1<=0 && laser.dis8<=0)//判断大爪子数据是否正常
+		if(1==OnorOff)
 		{
-			DataCorrect = 0;
-			RequestStop(BURN_POOL);  //请求料池433停止发送数据	
-			RequestStop(BIG_CAR);    //请求大车433停止发送数据
-			RequestStart(BIG_CLAW);  //请求大爪433发送数据	
-		}	
-		else
-			DataCorrect = 1;	
+			if (laser.dis1<=0 && laser.dis8<=0)//判断大爪子数据是否正常
+			{
+				BigClawDataCorrect = 0;
+				RequestStart(BIG_CLAW);  //请求大爪433发送数据	
+			}	
+			else
+				BigClawDataCorrect = 1;			
+		}
+		else if(0==OnorOff)
+		{
+			RequestStop(BIG_CLAW);
+		}
 	}
 }
 /*
@@ -1060,3 +1074,53 @@ void ResetFlagBit(void)
 	 DOWN_BIT=0;
 	 UP_BIT=0;	
 }
+/*
+*****************************************************************************************************************
+*                                    void RequestStop(uint8_t dev)
+*
+*Description : 请求大行车/大爪子停止发送指令
+*Arguments   : dev:设备号
+*Returns     : none
+*Notes       : none
+*****************************************************************************************************************
+*/
+void RequestStop(uint8_t dev)
+ {
+	switch(dev)
+	{
+		case BIG_CAR:
+					RequestStopToBigCar();
+					break;
+		case BIG_CLAW:
+					RequestStopToBigClaw();
+					break;		
+		default:
+				break;
+	}
+}
+/*
+*****************************************************************************************************************
+*                                    void RequestStart(uint8_t dev)
+*
+*Description : 请求大行车/大爪子开始发送指令
+*Arguments   : dev:设备号
+*Returns     : none
+*Notes       : none
+*****************************************************************************************************************
+*/
+void RequestStart(uint8_t dev)
+{
+	switch(dev)
+	{
+		case BIG_CAR:
+					RequestStartToBigCar();
+					break;
+		case BIG_CLAW:
+				 	RequestStartToBigClaw();	
+					break;		
+		default:
+				  break;
+	}
+}
+
+
