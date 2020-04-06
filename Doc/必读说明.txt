@@ -22,7 +22,15 @@
 			   uint8_t PointMove = 0;      //大行车点动标志位
 			   int PointMoveTime = 0;      //点动时间
 
-
+2020/03/25
+    (1)添加CRC.c,CRC.h
+	
+2020/03/24
+	(1)新增 LCFunc.c         直接控制底层
+	(2)新增 Manual.c         手动控制
+	(3)新增 FullAuto         全自动化
+	(4)新增 HalfAuto         半自动化
+	(5)移除 Task.c           
 
 
 	
