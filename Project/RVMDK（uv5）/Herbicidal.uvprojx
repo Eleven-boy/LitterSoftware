@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\User\systick;..\..\User\GPIO;..\..\User\led;..\..\User\Beep;..\..\User\key;..\..\User\basic_tim;..\..\User\UART4;..\..\User\USART1;..\..\User\USART2;..\..\User\USART3;..\..\User\USART6;..\..\User\ADC;..\..\User\Data_type;..\..\User\Control;..\..\User\relay;..\..\User\alarm;..\..\User\exti;..\..\User\Task</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\User\systick;..\..\User\GPIO;..\..\User\led;..\..\User\Beep;..\..\User\key;..\..\User\basic_tim;..\..\User\UART4;..\..\User\USART1;..\..\User\USART2;..\..\User\USART3;..\..\User\USART6;..\..\User\ADC;..\..\User\Data_type;..\..\User\Control;..\..\User\relay;..\..\User\alarm;..\..\User\exti;..\..\User\Task;..\..\User\CRC;..\..\..\..\RS485;..\..\User\LCFunc;..\..\User\Manual;..\..\User\FullAuto;..\..\User\HalfAuto</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -704,9 +704,34 @@
               <FilePath>..\..\User\exti\exti.c</FilePath>
             </File>
             <File>
-              <FileName>Task.c</FileName>
+              <FileName>CRC.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\User\Task\Task.c</FilePath>
+              <FilePath>..\..\User\CRC\CRC.c</FilePath>
+            </File>
+            <File>
+              <FileName>RS485.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\RS485\RS485.c</FilePath>
+            </File>
+            <File>
+              <FileName>LCFunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\LCFunc\LCFunc.c</FilePath>
+            </File>
+            <File>
+              <FileName>Manual.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Manual\Manual.c</FilePath>
+            </File>
+            <File>
+              <FileName>FullAuto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\FullAuto\FullAuto.c</FilePath>
+            </File>
+            <File>
+              <FileName>HalfAuto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\HalfAuto\HalfAuto.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -716,7 +741,7 @@
             <File>
               <FileName>必读说明.txt</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\必读说明.txt</FilePath>
+              <FilePath>..\..\Doc\必读说明.txt</FilePath>
             </File>
           </Files>
         </Group>
