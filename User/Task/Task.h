@@ -17,14 +17,14 @@
 
 /************************************************************/
 
-void BigCarTask(void);
-void BigCarRunning(void);
-void HorizontalMoving(float x,float y);
-void VerticalMoving(float z);
-void VerticalMoveOrigin(float z);
-void RisePawFromBurnPool(void);
-void RisePawFromPlatform(void);
-void RisePawFromLitterPool(void);
-void LowerClawtoBurnPool(void);
+static void BigCarTask(void);
+static void BigCarRunning(void);
+static void HorizontalMoving(float x,float y);
+static void VerticalMoving(float z);
+static void VerticalMoveOrigin(float z);
+static void RisePawFromBurnPool(void);
+static void RisePawFromPlatform(void);
+static void RisePawFromLitterPool(void);
+static void LowerClawtoBurnPool(void);
 #endif /* __TASK_H */
 

@@ -18,10 +18,18 @@ extern POSITION origin;//起始位置
 extern POSITION target;//目标位置 
 
 uint8_t FullAutoStep = 0;
-
+/*
+*****************************************************************************************************************
+*                                    void BigCarFullAutoMode(void)
+*
+*Description : 全自动任务执行函数
+*Arguments   : none
+*Returns     : none
+*Notes       : none
+*****************************************************************************************************************
+*/
 void BigCarFullAutoMode(void)
 {
-	
 	if(0==FullAutoStep)//行车上电
  	{
 		PowerOn();
@@ -33,30 +41,17 @@ void BigCarFullAutoMode(void)
 	}
 	else if(1==FullAutoStep)// 从四楼平台抬升爪子
 	{
-		FullRisePawFromPlatform();
+		RisePawFromPlatform();
 		if(UP_BIT == 1)//上升结束
 		{
 			FullAutoStep++;//进行下一步
 			UP_BIT=0;//标志位复位
 		}
-		else if(UP_BIT == 2)//运行出错
-		{
-			PowerOff();
-			if(RelayOffflag==-2)
-			{
-				ErrorBigCar = FullAutoStep;//记录出错在哪一步
-				RelayOffflag=-1;
-				FullAutoStep=0;
-			  UP_BIT = 0;
-				WaitFlag=0;      
-				Run_Mode=0;
-			}
-		}
 	}
 	else if(2==FullAutoStep)//水平移动到抓料处正上方
 	{
 		target.x[0] = (GARBAGE_X-target.x[0]-BIG_CAR_X_OFFSET)+ADD_X;
-		FullHorizontalMoving(target.x[0],target.y[0]);
+		HorizontalMoving(target.x[0],target.y[0]);
 		if((1==X_MOVE_BIT)&&(1==Y_MOVE_BIT))
 		{
 			FullAutoStep++;//进行下一步
@@ -67,7 +62,7 @@ void BigCarFullAutoMode(void)
 	}
 	else if(3==FullAutoStep)//爪子开始下降去抓料
 	{
-		FullDowntoLitterPool(target.z[0]);
+		DowntoLitterPool(target.z[0]);
 		if(1==DOWN_BIT)
 		{
 			FullAutoStep++;//进行下一步
@@ -77,7 +72,7 @@ void BigCarFullAutoMode(void)
 	}
 	else if(4==FullAutoStep)//执行抓料动作
 	{
-		FullClosePaw();
+		HFClosePaw();
 		if(2==CloseFlag)
 		{
 			FullAutoStep++;//进行下一步
@@ -87,7 +82,7 @@ void BigCarFullAutoMode(void)
 	}
 	else if(5==FullAutoStep)//执行大爪上升动作
 	{
-		FullRisePawFromLitterPool();
+		RisePawFromLitterPool();
 		if(1==UP_BIT)
 		{
 			FullAutoStep++;//进行下一步
@@ -96,17 +91,17 @@ void BigCarFullAutoMode(void)
 	}
 	else if(6==FullAutoStep)//水平移动至焚烧池上方
 	{
-		FullHorizontalMoving(BURN_POOL_X,BURN_POOL_Y);
+		HorizontalMoving(BURN_POOL_X,BURN_POOL_Y);
 		if((1==X_MOVE_BIT)&&(1==Y_MOVE_BIT))
 		{
 			FullAutoStep++;//进行下一步
-			X_MOVE_BIT=0;//标志位复位
-			Y_MOVE_BIT=0;//标志位复位
+			X_MOVE_BIT=0;  //标志位复位
+			Y_MOVE_BIT=0;  //标志位复位
 		}
 	}
 	else if(7==FullAutoStep)//下放大爪子靠近焚烧池
 	{
-		FullDownClawtoBurnPool();
+		DownClawtoBurnPool();
 		if(1==DOWN_BIT)
 		{
 			FullAutoStep++;//进行下一步
@@ -116,7 +111,7 @@ void BigCarFullAutoMode(void)
 	}
 	else if(7==FullAutoStep)//松开爪子放料
 	{
-		FullOpenPaw();
+		HFOpenPaw();
 		if(2==OpenFlag)
 		{
 			FullAutoStep++;//进行下一步
@@ -125,17 +120,16 @@ void BigCarFullAutoMode(void)
 	}
 	else if(8==FullAutoStep)//提升爪子至安全高度
 	{
-		FullRisePawFromBurnPool();
+		RisePawFromBurnPool();
 		if(1==UP_BIT)
 		{
 			FullAutoStep++;//进行下一步
 			UP_BIT = 0;
 		}
-		
 	}
 	else if(9==FullAutoStep)//水平移动到初始位置上方
 	{
-		FullHorizontalMoving(ORIGIN_X,ORIGIN_Y);
+		HorizontalMoving(ORIGIN_X,ORIGIN_Y);
 		if((1==X_MOVE_BIT)&&(1==Y_MOVE_BIT))
 		{
 			FullAutoStep++;//进行下一步
@@ -143,16 +137,16 @@ void BigCarFullAutoMode(void)
 			Y_MOVE_BIT=0;//标志位复位
 		}
 	}
-	else if(9==FullAutoStep)//将爪子下降到四楼平台
+	else if(10==FullAutoStep)//将爪子下降到四楼平台
 	{
-		FullDownToOrigin(ORIGIN_Z);
+		DownToOrigin(ORIGIN_Z);
 		if(1==DOWN_BIT)
 		{
 			FullAutoStep++;//进行下一步
-			
+			DOWN_BIT=0;//标志位复位
 		}
 	}
-	else if(10==FullAutoStep)//断开电源,运行结束
+	else if(11==FullAutoStep)//断开电源,运行结束
 	{
 		PowerOff();
 		if(RelayOffflag==-2)
@@ -181,7 +175,7 @@ void BigCarFullAutoMode(void)
 }
 /*
 *****************************************************************************************************************
-*                                    void FullRisePawFromPlatform(void)
+*                                    void RisePawFromPlatform(void)
 *
 *Description : 从四楼平台抬升爪子
 *Arguments   : none
@@ -189,7 +183,7 @@ void BigCarFullAutoMode(void)
 *Notes       : 使用往下射的激光laser.dis1
 *****************************************************************************************************************
 */
-void FullRisePawFromPlatform(void)
+void RisePawFromPlatform(void)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{
@@ -214,7 +208,7 @@ void FullRisePawFromPlatform(void)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullHorizontalMoving(float x,float y)
+void HorizontalMoving(float x,float y)
 {
 	if(1==BigCarDataCorrect)//数据正常
 	{
@@ -237,7 +231,7 @@ void FullHorizontalMoving(float x,float y)
 
 /*
 *****************************************************************************************************************
-*                                   void FullDowntoLitterPool(float z)
+*                                   void DowntoLitterPool(float z)
 *
 *Description : 竖直下降到料池底部抓料
 *Arguments   : z:爪子下降到距垃圾的高度
@@ -245,7 +239,7 @@ void FullHorizontalMoving(float x,float y)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullDowntoLitterPool(float z)
+void DowntoLitterPool(float z)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{
@@ -262,7 +256,7 @@ void FullDowntoLitterPool(float z)
 }
 /*
 *****************************************************************************************************************
-*                                     void FullClosePaw(void)
+*                                     void HClosePaw(void)
 *
 *Description : 抓料函数
 *Arguments   : none
@@ -270,13 +264,13 @@ void FullDowntoLitterPool(float z)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullClosePaw(void)
+void HFClosePaw(void)
 {
 	ClosePaw();
 }
 /*
 *****************************************************************************************************************
-*                                void FullRisePawFromLitterPool(void)
+*                                void RisePawFromLitterPool(void)
 *
 *Description : 从垃圾池抬升爪子
 *Arguments   : none
@@ -284,7 +278,7 @@ void FullClosePaw(void)
 *Notes       : 刚开始用往下射的激光，运行到上半部分用往上射的激光
 *****************************************************************************************************************
 */
-void FullRisePawFromLitterPool(void)
+void RisePawFromLitterPool(void)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{
@@ -301,7 +295,7 @@ void FullRisePawFromLitterPool(void)
 }
 /*
 *****************************************************************************************************************
-*                                void FillDownClawtoBurnPool(void)
+*                                void DownClawtoBurnPool(void)
 *
 *Description : 下放爪子至焚料池
 *Arguments   : none
@@ -309,7 +303,7 @@ void FullRisePawFromLitterPool(void)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullDownClawtoBurnPool(void)
+void DownClawtoBurnPool(void)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{
@@ -326,7 +320,7 @@ void FullDownClawtoBurnPool(void)
 }
 /*
 *****************************************************************************************************************
-*                                     void FullOpenPaw(void)
+*                                     void HFOpenPaw(void)
 *
 *Description : 放料函数
 *Arguments   : none
@@ -334,13 +328,13 @@ void FullDownClawtoBurnPool(void)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullOpenPaw(void)
+void HFOpenPaw(void)
 {
 	ReleasePaw();
 }
 /*
 *****************************************************************************************************************
-*                                     void FullRisePawFromBurnPool(void)
+*                                     void RisePawFromBurnPool(void)
 *
 *Description : 从焚烧池抬升爪子
 *Arguments   : none
@@ -348,7 +342,7 @@ void FullOpenPaw(void)
 *Notes       : none
 *****************************************************************************************************************
 */
-void FullRisePawFromBurnPool(void)
+void RisePawFromBurnPool(void)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{
@@ -365,7 +359,7 @@ void FullRisePawFromBurnPool(void)
 }
 /*
 *****************************************************************************************************************
-*                                     void FullDownToOrigin(void)
+*                                     void DownToOrigin(void)
 *
 *Description : 竖直降落到初始位置
 *Arguments   : none
@@ -373,7 +367,7 @@ void FullRisePawFromBurnPool(void)
 *Notes       : 用大爪子往下射的激光
 *****************************************************************************************************************
 */
-void FullDownToOrigin(float z)
+void DownToOrigin(float z)
 {
 	if(1==BigClawDataCorrect)//数据正常
 	{

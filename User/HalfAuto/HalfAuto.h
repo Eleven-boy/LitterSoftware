@@ -1,5 +1,5 @@
-#ifndef __FULLAUTO_H
-#define	__FULLAUTO_H
+#ifndef __HALFAUTO_H
+#define	__HALFAUTO_H
 
 #include "stm32f4xx.h"
 
@@ -16,15 +16,8 @@
 
 
 /************************************************************/
-extern void BigCarFullAutoMode(void);
-extern void RisePawFromPlatform(void);
-extern void HorizontalMoving(float x,float y);
-extern void DowntoLitterPool(float z);
-extern void HFClosePaw(void);
-extern void RisePawFromLitterPool(void);
-extern void DownClawtoBurnPool(void);
-extern void HFOpenPaw(void);
-extern void RisePawFromBurnPool(void);
-extern void DownToOrigin(float z);
+
+extern void BigCarHalfAutoMode(void);
+static void ConfirmNextStep(uint8_t step);
 #endif /* __TASK_H */
 

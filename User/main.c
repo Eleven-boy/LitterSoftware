@@ -33,10 +33,11 @@
 #include "usart1.h"
 #include "usart2.h"
 #include "uart4.h"
-#include "task.h"
 #include "Control.h"	
 #include "Manual.h"
 #include "LCFunc.h"
+#include "FullAuto.h"
+#include "HalfAuto.h"
  /*
  *************************************************************************
  *                          全局变量
@@ -49,6 +50,7 @@ uint8_t Run_Mode = 0;
 
 POSITION origin;//起始位置
 POSITION target;//目标位置 
+
  /*
  *************************************************************************
  *                        函数声明
@@ -127,17 +129,13 @@ int main(void)
 				}
 				else if(2==Run_Mode)//半自动
 				{
-				
+					BigCarHalfAutoMode();
 				}
 				else if(3==Run_Mode)//全自动
 				{
-					
+					BigCarFullAutoMode();
 				}
 			}
-			
-			
-
-
 		}
 		else if(task_tim.time_100ms >= 200)
 		{
