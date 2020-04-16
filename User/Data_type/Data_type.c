@@ -7,6 +7,7 @@ unsigned char send_request_to_xxx[3][6] = {{0x00,0x06,0x0F},//BIG_CAR
 																				   };
 Laser laser;
 MPU6050 mpu; 
+UP_DATA Up_Data;
 //POSITION origin;//起始位置
 //POSITION target;//目标位置 
 /*********************************************END OF FILE**********************/

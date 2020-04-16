@@ -75,10 +75,13 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}	
 		}
+		Up_Data.Status = (Up_Data.Status&0xF0)|(0xF1);
 	}
 	else if(1==HalfAutoStep)// 从四楼平台抬升爪子
 	{
@@ -100,8 +103,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}	
 		}
 	}
@@ -128,9 +133,11 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
 				UpOrDown = 0;//0代表上半部，1代表下半部,为下面下降程序做准备
+				IsExecute=0;
 			}			
 		}
 	}
@@ -155,9 +162,11 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
 				CloseFlag=1;//将下面执行的抓料标志位置1
+				IsExecute=0;
 			}				
 		}
 	}
@@ -182,9 +191,11 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
 				UpOrDown = 1;  //0代表上半部，1代表下半部,将爪子上抬标志位置1
+				IsExecute=0;
 			}		
 		}
 	}
@@ -208,8 +219,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}	
 		}
 	}
@@ -234,8 +247,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -260,9 +275,11 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				OpenFlag=1;    //将松开爪子标志位置1
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -286,8 +303,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -311,8 +330,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -337,8 +358,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -362,8 +385,10 @@ void BigCarHalfAutoMode(void)
 			ConfirmNextStep(HalfAutoStep+1);
 			if(1==IsExecute)//经上位机确定执行下一步
 			{
+				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
 				SingleStepOver=0;
+				IsExecute=0;
 			}
 		}
 	}
@@ -384,6 +409,7 @@ void BigCarHalfAutoMode(void)
 		if(RelayOffflag==-2)
 		{
 			ErrorBigCar = HalfAutoStep;//记录出错在哪一步
+			Up_Data.Status =  Up_Data.Status&0xF0;
 			RelayOffflag=-1;
 			HalfAutoStep=0;
 			X_MOVE_BIT=0;//标志位复位
@@ -407,5 +433,5 @@ void BigCarHalfAutoMode(void)
 */
 void ConfirmNextStep(uint8_t step)
 {
-	
+	Up_Data.HalfStep = step;
 }

@@ -55,14 +55,26 @@ extern MPU6050 mpu;
 
 //位置坐标
 typedef struct{
-    float x[2];
-    float y[2];
-    float z[2];
+    int x[2];
+    int y[2];
+    int z[2];
 }POSITION; 
 extern POSITION origin;//起始位置
 extern POSITION target;//目标位置 
-//extern POSITION BURN_POOL_Target;//料坑目标位置
 
+//主控给上位机发送的数据内容
+typedef struct
+{
+	uint8_t       Add;     //地址码
+	int           P_x;     //x坐标
+	int           P_y;     //y坐标
+	int           P_z;	   //z坐标
+	int16_t       A_x;     //6050x轴角度
+	int16_t       A_y;     //6050y轴角度
+	uint8_t       Status;  //行车运行状态
+	uint8_t       HalfStep;//半自动状态下需要请求的下步动作
+}UP_DATA;
+extern UP_DATA Up_Data;
 typedef struct
 {																						  
 	u16 time_1ms;                             //

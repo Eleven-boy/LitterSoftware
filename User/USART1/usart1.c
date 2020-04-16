@@ -293,67 +293,9 @@ void USARTx_IRQHandler(void)
 		 uint8_t Uart1_Rec_Len = U1_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			//算出接本帧数据长度
 	   USART_RX_DMAReset();
 		 //数据帧处理
-		 if(6==Uart1_Rec_Len)//SMALL_CAR
+		 if(8==Uart1_Rec_Len)
 		 {
-			 if(0xEE == u1_receive_buff[0])
-			 {
-					for(uint8_t i=0;i<5;i++)
-					{
-						sum += u1_receive_buff[i];
-					}
-					
-					if(u1_receive_buff[5] == sum)
-					{
-						laser.sampleval2 = (u1_receive_buff[2]<<8|u1_receive_buff[1]);
-						laser.sampleval3 = (u1_receive_buff[4]<<8|u1_receive_buff[3]);	
-						laser.dis2 = 10.0f*((laser.sampleval2*3300.0f)/4096.0f)-6000.0f+100.0f;//X
-						laser.dis3 = 5.0f*((laser.sampleval3*3300.0f)/4096.0f)-3000.0f+100.0f;//Y
-					}	
-					sum=0;
-			 }
-		 }
-		 else if(15==Uart1_Rec_Len)//SMALL_CLAW
-		 {
-				if(0xAA == u1_receive_buff[0])
-				{
-					for(uint8_t i=0;i<14;i++)
-					{
-						sum += u1_receive_buff[i];
-					}
-					
-					if(u1_receive_buff[14] == sum)
-					{
-						mpu.acc_z        = (u1_receive_buff[2]<<8|u1_receive_buff[1])/32767.0f*16.0f;
-						mpu.gyro_z       = (u1_receive_buff[4]<<8|u1_receive_buff[3])/32767.0f*2000.0f;	
-						mpu.angle_x      = (u1_receive_buff[6]<<8|u1_receive_buff[5])/32767.0f*180.0f;		
-						mpu.angle_y      = (u1_receive_buff[8]<<8|u1_receive_buff[7])/32767.0f*180.0f;		
-						mpu.angle_z      = (u1_receive_buff[10]<<8|u1_receive_buff[9])/32767.0f*180.0f;	
-						laser.sampleval1 = (u1_receive_buff[12]<<8|u1_receive_buff[11]);
-						laser.dis1      =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;
-					}
-					sum=0;
-				}
-		 }
-		 else if(8==Uart1_Rec_Len)
-		 {
-				if(0xCC == u1_receive_buff[0])//BURN_POOL
-				{
-					for(uint8_t i=0;i<7;i++)
-					{
-						sum += u1_receive_buff[i];
-					}
-					if(u1_receive_buff[7] == sum)
-					{
-						laser.sampleval2 = (u1_receive_buff[2]<<8|u1_receive_buff[1]);
-						laser.sampleval3 = (u1_receive_buff[4]<<8|u1_receive_buff[3]);	
-						laser.sampleval4 = (u1_receive_buff[6]<<8|u1_receive_buff[5]);	
-						laser.dis2 = 5.0f*((laser.sampleval2*3300.0f)/4096.0f)-3000.0f;//从墙开始第1个，检测爪子下降
-						laser.dis3 = 10.0f*((laser.sampleval3*3300.0f)/4096.0f)-6000.0f;//从墙开始第2个，料位检测
-						laser.dis4 = 10.0f*((laser.sampleval4*3300.0f)/4096.0f)-6000.0f;//从墙开始第3个，料位检测
-					}
-					sum=0;
-				}
-				else if(0xDD == u1_receive_buff[0])//BIG_CAR
+				if(0xDD == u1_receive_buff[0])//BIG_CAR
 				{
 					for(uint8_t i=0;i<7;i++)
 					{
@@ -367,6 +309,8 @@ void USARTx_IRQHandler(void)
 						laser.dis5 = 5.0f*((laser.sampleval5*3300.0f)/4096.0f)-3000.0f+60.0f;//检测大抓
 						laser.dis6 = 10.0f*((laser.sampleval6*3300.0f)/4096.0f)-6000.0f+60.0f;//X
 						laser.dis7 = 5.0f*((laser.sampleval7*3300.0f)/4096.0f)-3000.0f+60.0f;//Y
+						Up_Data.P_x = (int)laser.dis6;
+						Up_Data.P_y = (int)laser.dis7;
 					}
 					sum=0;
 				}

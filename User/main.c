@@ -32,6 +32,7 @@
 #include "bsp_key.h" 
 #include "usart1.h"
 #include "usart2.h"
+#include "RS485.h"
 #include "uart4.h"
 #include "Control.h"	
 #include "Manual.h"
@@ -47,6 +48,8 @@
 uint8_t WaitFlag = 0;
 //运行模式 1：手动   2：半自动   3：全自动
 uint8_t Run_Mode = 0;
+//0:不上传，1:上传
+uint8_t Up_Data_Flag = 0;
 
 POSITION origin;//起始位置
 POSITION target;//目标位置 
@@ -87,7 +90,7 @@ int main(void)
 			{				
 				//ChoseTask(Choice);
 				/*给Run_Mode赋值，指示何种运行模式*/
-				HTaskModeFlag = 0;
+				//HTaskModeFlag = 0;
 				WaitFlag = 2;//已收到指令正在运行
 			}
 			else if(0 == WaitFlag)
@@ -137,9 +140,19 @@ int main(void)
 				}
 			}
 		}
-		else if(task_tim.time_100ms >= 200)
+		
+		if(task_tim.time_100ms >= 200)//100ms发送
 		{
-			
+			if(1==Up_Data_Flag)
+			{
+				RS485_Send_Data();//100ms上传一次数据		
+				Up_Data_Flag=0;				
+			}
+			//出错报警
+			if(!ErrorBigCar)
+			{
+				ALARM_ON;
+			}
 		}
 	}	 
 }
@@ -154,6 +167,7 @@ void BSP_Init(void)
 	EXTI10_Init();                  //外部中断初始化(用于紧急停止按钮 )
 	USART1_Init(115200);            //USART1初始化(接收传感器的433)
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
+	RS485_Init(115200);             //RS485初始化
 	UART4_Init(115200);	            //UART4初始化(用于调试用)
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
 }

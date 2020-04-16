@@ -64,25 +64,38 @@ extern uint8_t Big_Claw_Up_Delay_Flag;//打开定时器标志位
 
 extern int64_t Big_Claw_Up_Delay_Pool;
 extern uint8_t Big_Claw_Up_Delay_Pool_Flag;
+
+//暂停时需要保护的变量
+typedef struct
+{
+	uint8_t _WaitFlag;//此时通讯状态
+	uint8_t _Run_Mode;//任务模式
+	uint8_t _ReverseStop;//反向停止标志位
+	uint8_t _PointMove;//点动标志位
+	uint8_t _CloseFlag;//爪子合拢标志位
+	uint8_t _OpenFlag;//爪子张开标志位
+}Provar;
 /************************************************************/
 
-void ClosePaw(void);
-void ReleasePaw(void);
-void XMoving(float x);
-void YMoving(float y);
-void UpPawFromBurnPool(float z);
-void UpPawFromPlatform(float z);
-void UpPawFromLitterPool(float z);
-void DownPawToBurnPool(float z);
-void DownPawToLitterPool(float z);
-void DownPawToPlatform(float z);
-void SelfCheckStatus(void);
-void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff);
-void RevStop(float err);
-void HorizontalDotMove(float err_x,float err_y);
-void VerticalDotMove(float err_z);
-void ResetFlagBit(void);
-void RequestStop(uint8_t dev);
-void RequestStart(uint8_t dev);
+extern void ClosePaw(void);
+extern void ReleasePaw(void);
+extern void XMoving(float x);
+extern void YMoving(float y);
+extern void UpPawFromBurnPool(float z);
+extern void UpPawFromPlatform(float z);
+extern void UpPawFromLitterPool(float z);
+extern void DownPawToBurnPool(float z);
+extern void DownPawToLitterPool(float z);
+extern void DownPawToPlatform(float z);
+extern void SelfCheckStatus(void);
+extern void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff);
+extern void RevStop(float err);
+extern void HorizontalDotMove(float err_x,float err_y);
+extern void VerticalDotMove(float err_z);
+extern void ResetFlagBit(void);
+extern void RequestStop(uint8_t dev);
+extern void RequestStart(uint8_t dev);
+extern void TaskSuspend(void);
+extern void ConExecute(void);
 #endif /* __TASK_H */
 

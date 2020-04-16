@@ -11,7 +11,7 @@
 #define alarm        PBout(12)      
 
 #define ALARM_ON     (alarm=1)
-#define ALARM_OFF    (alarm=1)
+#define ALARM_OFF    (alarm=0)
 
 void Alarm_GPIO_Init(void);
 

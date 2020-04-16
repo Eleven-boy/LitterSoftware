@@ -17,7 +17,9 @@
  *                       全局变量
  *************************************************************************  
  */
- 
+extern uint8_t WaitFlag;
+extern uint8_t Run_Mode;
+
  //0:没有运行，1：正常运行结束，2：数据出的故障不得已结束
 uint8_t X_MOVE_BIT=0;
 uint8_t Y_MOVE_BIT=0;
@@ -60,6 +62,7 @@ uint8_t Big_Claw_Up_Delay_Flag = 0;//打开定时器标志位
 int64_t Big_Claw_Up_Delay_Pool = 0;
 uint8_t Big_Claw_Up_Delay_Pool_Flag = 0;
 
+Provar BCVar;
 /*
 *****************************************************************************************************************
 *                                     void ClosePaw(void) 
@@ -1122,5 +1125,46 @@ void RequestStart(uint8_t dev)
 				  break;
 	}
 }
+//暂停
+void TaskSuspend(void)
+{
+	BCVar._CloseFlag = CloseFlag;
+	BCVar._OpenFlag = OpenFlag;
+	BCVar._PointMove = PointMove;
+	BCVar._ReverseStop = ReverseStop;
+	BCVar._Run_Mode = Run_Mode;
+	BCVar._WaitFlag = WaitFlag;
+	
+	PowerOff();//给遥控器断电
+	
+	CloseFlag = 0;
+	OpenFlag = 0;
+	PointMove = 0;
+	ReverseStop = 0;
+	Run_Mode = 0;
+	WaitFlag = 0;
+	//Up_Data.Status   //暂停
+}
+//恢复运行
+void ConExecute(void)
+{
 
+	//Up_Data.Status   //暂停
+	CloseFlag = BCVar._CloseFlag;
+	OpenFlag = BCVar._OpenFlag;
+	PointMove = BCVar._PointMove;
+	ReverseStop = BCVar._ReverseStop;
+	Run_Mode = BCVar._Run_Mode;
+	WaitFlag = BCVar._WaitFlag;
+	
+	PowerOn();//给遥控器上电
 
+	BCVar._CloseFlag = 0;
+	BCVar._OpenFlag = 0;
+	BCVar._PointMove = 0;
+	BCVar._ReverseStop = 0;
+	BCVar._Run_Mode = 0;
+	BCVar._WaitFlag = 0;
+	
+	//Up_Data.Status   //恢复运行
+}

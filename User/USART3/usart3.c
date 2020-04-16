@@ -1,10 +1,12 @@
 #include "usart3.h"
-
+#include "Data_type.h"
+#include "RS485.h"
+#include "CRC.h"
 #define U3_BUFFSIZERECE  100
 #define U3_BUFFSIZESEND  100
 
 uint8_t u3_receive_buff[U3_BUFFSIZERECE] = {0};
-
+extern int8_t IsExecute;//1:执行下一步,0：不执行下一步
 
 /*
 ***************************************************************
@@ -38,7 +40,6 @@ uint8_t u3_receive_buff[U3_BUFFSIZERECE] = {0};
 #define DMACLEAR                         DMA1->HIFCR = DMA_Stream3_IT_MASK;
 
 
-
 #define USART_RX_DMA 										DMA1_Stream1
 #define USART_RX_DMA_Channel   					DMA_Channel_4
 #define USART_RX_DMA_PeripheralBaseAddr  		(uint32_t) (&(USARTx->DR))
@@ -65,7 +66,7 @@ static void bsp_initUSART(u32 bound)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	/*************************************初始化串口2 用于双机通讯*************************************/
+	/*************************************初始化串口3 用于双机通讯*************************************/
 	/* 使能 GPIO clock */
 	RCC_AHB1PeriphClockCmd(USARTx_TX_GPIO_CLK|USARTx_RX_GPIO_CLK, ENABLE);
 
@@ -125,8 +126,6 @@ static void bsp_initUSART(u32 bound)
 	/* Enable USART */
 	USART_Cmd(USARTx, ENABLE);
 	USART_ClearFlag(USARTx, USART_FLAG_TC);
-	
-	
 }
 
 static void USART_DMA_RxConfig(void)
@@ -207,6 +206,7 @@ static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
 	  硬件清除之前做确认是不可能的，如果DMA传输只做一次，这一步可以忽略。
 	*/
 	DMA_DeInit(USART_TX_DMA);	
+	DMA_Cmd(USART_TX_DMA, DISABLE); 
 	while (DMA_GetCmdStatus(USART_TX_DMA) != DISABLE)
 	{
 	}
@@ -229,10 +229,10 @@ static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
 	DMA_InitStructure.DMA_Memory0BaseAddr =(uint32_t)BufferSRC ; /* 设置内存地址 */
 	DMA_Init(USART_TX_DMA,&DMA_InitStructure);
 	/* 使能发送传输完成中断 */
-	//DMA_ITConfig(USART_TX_DMA, DMA_IT_TC, ENABLE);  		
+	DMA_ITConfig(USART_TX_DMA, DMA_IT_TC, ENABLE);  		
 	/* 使能 DMA USART TX Stream */
 //	RS485SEND_1();
-//	DMA_Cmd(DMA2_Stream6, ENABLE); 
+	DMA_Cmd(USART_TX_DMA, ENABLE); 
 	
 	/* 
 	   检测DMA Stream 是否被正确的使能.如果DMA的参数配置错误了，那么DMA Stream
@@ -254,10 +254,10 @@ void USART3_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize)
 	*/
 	//DMA_DeInit(DMA1_Stream0);
 	//DMA1_Stream0->CR  = 0;		
+	DMA_Cmd(USART_TX_DMA, DISABLE);
 	while (DMA_GetCmdStatus(USART_TX_DMA) != DISABLE)
 	{
 	}
-	
 	USART_TX_DMA->NDTR = BufferSize;
 	USART_TX_DMA->M0AR = (uint32_t)BufferSRC;
 	/* 使能发送传输完成中断 */
@@ -283,15 +283,87 @@ static void USART_RX_DMAReset(void)
 }	
 
 //进中断
+
+extern uint8_t WaitFlag;
+extern uint8_t Run_Mode;
+extern uint8_t Up_Data_Flag;
 void USARTx_IRQHandler(void)
 {	
+	u8 i=0;
+  u16 CRC_NUM;
+	u8 valid_data[100];
+	
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       //当接收到数据完成
 	{
-	//	 bsp_LedToggle(1);
 		 USART_ReceiveData(USARTx);                         //读取数据 注意：这句必须要，否则不能够清除中断标志位。
 		 uint8_t Uart1_Rec_Len = U3_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			//算出接本帧数据长度
-	    USART_RX_DMAReset();
+	   USART_RX_DMAReset();
+		
 		 //数据帧处理
+		 if(0xAB == u3_receive_buff[0])//地址码
+		 {
+			 //CRC校验
+			 for(int j = 1;j<u3_receive_buff[1]-2;j++)
+					valid_data[i++] = u3_receive_buff[j];
+			 CRC_NUM = (u3_receive_buff[u3_receive_buff[1]-2] << 8 | u3_receive_buff[u3_receive_buff[1]-1]);
+			 
+			 if(CRC_NUM == CRC16(valid_data,i))//CRC校验通过
+			 {
+					if(1==u3_receive_buff[2])//监听,长时间运行状态
+					{
+						//WaitFlag = 0;
+						Up_Data.Status |= 0x01;
+					}
+					else if(2==u3_receive_buff[2])//手动
+					{
+						WaitFlag = 1;
+						Run_Mode = 1;
+					}
+					else if(3==u3_receive_buff[2])//半自动
+					{
+						target.x[0] = (u3_receive_buff[12]<<16)|(u3_receive_buff[13]<<16)|(u3_receive_buff[14]);
+						target.y[0] = (u3_receive_buff[14]<<15)|(u3_receive_buff[16]<<16)|(u3_receive_buff[17]); 
+						
+						WaitFlag = 1;
+						Run_Mode = 2;	
+						
+						Up_Data.Status &= 0xF0;
+						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到			
+					}
+					else if(4==u3_receive_buff[2])//全自动
+					{
+						target.x[0] = (u3_receive_buff[12]<<16)|(u3_receive_buff[13]<<16)|(u3_receive_buff[14]);
+						target.y[0] = (u3_receive_buff[14]<<15)|(u3_receive_buff[16]<<16)|(u3_receive_buff[17]); 
+						
+						if((u3_receive_buff[21]>>4)==0x01)
+							IsExecute = 1;//确认执行下一步
+						
+						WaitFlag = 1;
+						Run_Mode = 3;		
+						Up_Data.Status &= 0xF0;
+						Up_Data.Status |= 0x04;//返回该值，说明已成功接收到
+					}
+					else if(5==u3_receive_buff[2])//停止
+					{
+						
+					}
+					else if(6==u3_receive_buff[2])//暂停
+					{
+					
+					}
+					else if(7==u3_receive_buff[2])//恢复
+					{
+					
+					}
+					else if(8==u3_receive_buff[2])//重启
+					{
+					
+					}			 
+			 }
+				
+				Up_Data_Flag = 1;
+		 }
+		
 		 //直接在中断中接收处理数据 
 
 	}else if(USART_GetITStatus(USARTx, USART_IT_TC) == SET)

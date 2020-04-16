@@ -234,12 +234,18 @@ void USARTx_IRQHandler(void)
 					}
 					if(u2_receive_buff[13] == sum1)
 					{
-						mpu.acc_z        = (u2_receive_buff[2]<<8|u2_receive_buff[1])/32767.0f*16.0f;
-						mpu.gyro_z       = (u2_receive_buff[6]<<8|u2_receive_buff[5])/32767.0f*180.0f;		
-						mpu.angle_y      = (u2_receive_buff[8]<<8|u2_receive_buff[7])/32767.0f*180.0f;		
-						mpu.angle_z      = (u2_receive_buff[10]<<8|u2_receive_buff[9])/32767.0f*180.0f;	
+						mpu.acc_z     = ((short)(u2_receive_buff[2]<<8| u2_receive_buff[1]))/32767.0*16;
+						mpu.gyro_z    = ((short)(u2_receive_buff[4]<<8| u2_receive_buff[3]))/32767.0*2000;
+						mpu.angle_x   = ((short)(u2_receive_buff[6]<<8| u2_receive_buff[5]))/32767.0*180;
+						mpu.angle_y   = ((short)(u2_receive_buff[8]<<8| u2_receive_buff[7]))/32767.0*180;
+						mpu.angle_z   = ((short)(u2_receive_buff[10]<<8| u2_receive_buff[9]))/32767.0*180;  
 						laser.sampleval1 = (u2_receive_buff[12]<<8|u2_receive_buff[11]);
-						laser.dis1      =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;
+						laser.sampleval8 = ((u2_receive_buff[14]<<8| u2_receive_buff[13]))/1.0;
+						laser.dis1       =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;   //об
+						laser.dis8       =  5.0f*((laser.sampleval8*3300.0f)/4096.0f)-3000.0f+150;  //ио
+						Up_Data.P_z = (int)laser.dis1;
+						Up_Data.A_x = (int16_t)mpu.angle_x;
+						Up_Data.A_y = (int16_t)mpu.angle_y;
 					}
 					sum1=0;					
 				}
