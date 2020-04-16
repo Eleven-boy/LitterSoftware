@@ -25,13 +25,18 @@
 2020/03/25
     (1)添加CRC.c,CRC.h
 	
-2020/03/24
+2020/04/04
 	(1)新增 LCFunc.c         直接控制底层
 	(2)新增 Manual.c         手动控制
 	(3)新增 FullAuto         全自动化
 	(4)新增 HalfAuto         半自动化
 	(5)移除 Task.c           
 
+2020/04/16
+	(1)RS485.c     新增RS485发送函数void RS485_Send_Data(void)
+	(2)usart3.c    新增串口中断中接收内容
+	(3)LCFunc.c    新增暂停函数和恢复函数 void TaskSuspend(void)    void ConExecute(void)
+	(4)main.c      新增报警功能
 
 	
 	
