@@ -38,7 +38,7 @@ void BigCarFullAutoMode(void)
 			FullAutoStep++;//进行下一步
 			RelayOnflag=-1;//标志位复位
 		}
-		Up_Data.Status = (Up_Data.Status&0xF0)|(0xF1);	
+		//Up_Data.Status = (Up_Data.Status&0xF0)|(0xF1);	
 	}
 	else if(1==FullAutoStep)// 从四楼平台抬升爪子
 	{
@@ -152,6 +152,7 @@ void BigCarFullAutoMode(void)
 		PowerOff();
 		if(RelayOffflag==-2)
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x40;//此时的状态值 完成
 			RelayOffflag=-1;
 			WaitFlag=0;      
 			Run_Mode=0;

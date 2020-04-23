@@ -75,6 +75,7 @@ Provar BCVar;
 */
 void ClosePaw(void)
 {
+	Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 close
 	if(1 == CloseFlag)
 	{
 		if(CloseDelay<100)
@@ -101,6 +102,7 @@ void ClosePaw(void)
 */
 void ReleasePaw(void)
 {
+	Up_Data.Status = (Up_Data.Status&0x87)|0x38;//此时的状态值  release
 	if(1 == OpenFlag)
 	{
 		if(OpenDelay<100)
@@ -153,16 +155,19 @@ void XMoving(float x)
 	
 	if(abs(err_x)>2000)//偏差大于一定范围时，要移动	
 	{
+		
 		err_x = laser.dis6 - x;    //24米
 		//Now is moving to the X destination
 		if(err_x<0)//大行车向南移动
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x08;//此时的状态值 x-
 			//大行车开始向南移动
 			CAR_SOUTH(ON);
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);  		
 		}
 		else if(err_x>0)//大行车开始向北运动
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x00;//此时的状态值 x+
 			//大行车开始向北运动
 			CAR_NORTH(ON);		
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);	
@@ -171,6 +176,7 @@ void XMoving(float x)
 	//大行车X方向开始点动
 	else if(abs(err_x)<2000)//大行车X方向点动模式
 	{		
+		
 		if(err_x<0)//大行车向南点动
 		{
 			//大行车反向停止
@@ -260,11 +266,13 @@ void YMoving(float y)
 		//Now is moving to the Y destnation
 		if ((err_y>0))//大行车向东运动
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x10;//此时的状态值 y+
 			CAR_EAST(ON); 
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}
 		else if ((err_y<0))//大行车向西运动
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x18;//此时的状态值 y-
 			CAR_WEST(ON);
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}	
@@ -330,6 +338,7 @@ void UpPawFromBurnPool(float z)
 	/*情况1：正常情况运行*/
 	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
+		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		if(paw_err>=0)//大爪上升
 		{
 			PAW_UP(ON);	
@@ -390,6 +399,7 @@ void UpPawFromPlatform(float z)
 	/*情况1：正常情况运行*/
 	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
+		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		if(paw_err<=0)//大爪上升
 		{
 			PAW_UP(ON);	
@@ -445,6 +455,7 @@ void UpPawFromLitterPool(float z)
 
 	if(1==UpOrDown)//在下半部分，用往下射的激光 12米 dis1
 	{
+		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		if((laser.dis1>0 && laser.dis1<10000) && laser.dis8<0)
 		{
 			PAW_DOWN(ON);	
@@ -535,6 +546,7 @@ void DownPawToBurnPool(float z)
 	/*情况1：正常情况运行*/
 	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪下降
 	{
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down
 		if(paw_err<=0)//大爪下降
 		{
 			PAW_DOWN(ON);	
@@ -596,6 +608,7 @@ void DownPawToLitterPool(float z)
 	
 	if(0==UpOrDown)//用往上射的激光  24米  dis8
 	{		
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down
 		if((laser.dis8>0 && laser.dis8<21000) && laser.dis1<0)
 		{
 			PAW_DOWN(ON);	
@@ -703,7 +716,8 @@ void DownPawToPlatform(float z)
 	}
 	paw_err = laser.dis1 - z;   
 	laser.last_dis1 = laser.dis1;   
-		
+	
+  Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down	
 	//大爪下降
 	if(abs(paw_err)>1000)//大爪下降
 	{
@@ -1128,6 +1142,8 @@ void RequestStart(uint8_t dev)
 //暂停
 void TaskSuspend(void)
 {
+	Up_Data.Status = (Up_Data.Status&0x87)|0x50;//此时的状态值 暂停
+	
 	BCVar._CloseFlag = CloseFlag;
 	BCVar._OpenFlag = OpenFlag;
 	BCVar._PointMove = PointMove;
@@ -1149,7 +1165,7 @@ void TaskSuspend(void)
 void ConExecute(void)
 {
 
-	//Up_Data.Status   //暂停
+	Up_Data.Status = (Up_Data.Status&0x87)|0x58;//此时的状态值 恢复
 	CloseFlag = BCVar._CloseFlag;
 	OpenFlag = BCVar._OpenFlag;
 	PointMove = BCVar._PointMove;
@@ -1165,6 +1181,18 @@ void ConExecute(void)
 	BCVar._ReverseStop = 0;
 	BCVar._Run_Mode = 0;
 	BCVar._WaitFlag = 0;
+
+}
+
+void BigCarStop(void)//还需斟酌
+{
+	Up_Data.Status = (Up_Data.Status&0x87)|0x48;//此时的状态值 down
+	PowerOff();//给遥控器断电
 	
-	//Up_Data.Status   //恢复运行
+	CloseFlag = 0;
+	OpenFlag = 0;
+	PointMove = 0;
+	ReverseStop = 0;
+	Run_Mode = 0;
+	WaitFlag = 0;	
 }

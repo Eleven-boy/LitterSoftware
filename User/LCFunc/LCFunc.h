@@ -97,5 +97,6 @@ extern void RequestStop(uint8_t dev);
 extern void RequestStart(uint8_t dev);
 extern void TaskSuspend(void);
 extern void ConExecute(void);
+extern void BigCarStop(void);
 #endif /* __TASK_H */
 

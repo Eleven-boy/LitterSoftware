@@ -3,7 +3,7 @@
   * @file    main.c
   * @author  yueran
   * @version V1.0 裸机
-  * @date    2020-03-30
+  * @date    2020-04-18
   * @brief   无锡固废项目--大爪子
   *****************************************************************************
   * @attention
@@ -71,14 +71,15 @@ int main(void)
 		DataCommunicateManage(BIG_CLAW,1);//请求数据
 		DataCommunicateManage(BIG_CAR,1);//请求数据
 	}
+	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
 	//初始值
-	target.x[0] = 13000;
-	target.y[0] = 4000; 
-	target.z[0] = 1600; 
-	origin.x[0] = 7900; 
-	origin.y[0] = 4000; 
-	origin.z[0] = 1700;  
+//	target.x[0] = 13000;
+//	target.y[0] = 4000; 
+//	target.z[0] = 1600; 
+//	origin.x[0] = 7900; 
+//	origin.y[0] = 4000; 
+//	origin.z[0] = 1700;  
 
   //SelfCheckStatus();//开机启动自检程序
 	
@@ -93,7 +94,7 @@ int main(void)
 				//HTaskModeFlag = 0;
 				WaitFlag = 2;//已收到指令正在运行
 			}
-			else if(0 == WaitFlag)
+			else if(0 == WaitFlag)/*等待上位机发送命令*/
 			{
 				/*等待上位机发送命令*/
 			}
@@ -104,28 +105,36 @@ int main(void)
 					//根据指令选择要执行的任务
 					switch(HTaskModeFlag)
 					{
-						case 1: //停止断电
-	//						RelayOff();
-	//						HTaskModeFlag=0;
-							break;
-						case 2: //X
+						case 1: //X
 							ManualXMoving(target.x[0]);
 							break;
-						case 3: //Y
+						case 2: //Y
 							ManualYMoving(target.y[0]);
 							break;
-						case 4: //上升
+						case 3: //从料坑上升
 							
 							break;				
-						case 5: //下降
+						case 4: //从焚烧池上升
 							
 							break;
-						case 6: //抓
+						case 5: //从平台上升
+							
+							break;	
+						case 6: //下降到垃圾池
+							
+							break;		
+						case 7: //下降到焚料池
+							
+							break;
+						case 8: //下降到平台
+							
+							break;		
+						case 9: //抓料
 							ManualClose();
 							break;	
-						case 7: //松
+						case 10: //放料
 							ManualOpen();
-							break;				
+							break;							
 						default:
 							break;
 					}			
@@ -168,7 +177,7 @@ void BSP_Init(void)
 	USART1_Init(115200);            //USART1初始化(接收传感器的433)
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
 	RS485_Init(115200);             //RS485初始化
-	UART4_Init(115200);	            //UART4初始化(用于调试用)
+	//UART4_Init(115200);	            //UART4初始化(用于调试用)
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
 }
 

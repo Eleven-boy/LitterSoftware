@@ -1,5 +1,6 @@
 #include "usart3.h"
 #include "Data_type.h"
+#include "Manual.h"
 #include "RS485.h"
 #include "CRC.h"
 #define U3_BUFFSIZERECE  100
@@ -309,17 +310,22 @@ void USARTx_IRQHandler(void)
 			 
 			 if(CRC_NUM == CRC16(valid_data,i))//CRC校验通过
 			 {
-					if(1==u3_receive_buff[2])//监听,长时间运行状态
+					if(0==(u3_receive_buff[2]&0x07))//监听,长时间运行状态
 					{
 						//WaitFlag = 0;
-						Up_Data.Status |= 0x01;
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x00;//返回该值，说明已成功接收到	
 					}
-					else if(2==u3_receive_buff[2])//手动
+					else if(1==(u3_receive_buff[2]&0x07))//手动
 					{
 						WaitFlag = 1;
 						Run_Mode = 1;
+						HTaskModeFlag = u3_receive_buff[2]>>3;
+						
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x01;//返回该值，说明已成功接收到									
 					}
-					else if(3==u3_receive_buff[2])//半自动
+					else if(2==(u3_receive_buff[2]&0x07))//半自动
 					{
 						target.x[0] = (u3_receive_buff[12]<<16)|(u3_receive_buff[13]<<16)|(u3_receive_buff[14]);
 						target.y[0] = (u3_receive_buff[14]<<15)|(u3_receive_buff[16]<<16)|(u3_receive_buff[17]); 
@@ -327,10 +333,10 @@ void USARTx_IRQHandler(void)
 						WaitFlag = 1;
 						Run_Mode = 2;	
 						
-						Up_Data.Status &= 0xF0;
-						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到			
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x02;//返回该值，说明已成功接收到			
 					}
-					else if(4==u3_receive_buff[2])//全自动
+					else if(3==(u3_receive_buff[2]&0x07))//全自动
 					{
 						target.x[0] = (u3_receive_buff[12]<<16)|(u3_receive_buff[13]<<16)|(u3_receive_buff[14]);
 						target.y[0] = (u3_receive_buff[14]<<15)|(u3_receive_buff[16]<<16)|(u3_receive_buff[17]); 
@@ -340,24 +346,24 @@ void USARTx_IRQHandler(void)
 						
 						WaitFlag = 1;
 						Run_Mode = 3;		
-						Up_Data.Status &= 0xF0;
-						Up_Data.Status |= 0x04;//返回该值，说明已成功接收到
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到
 					}
-					else if(5==u3_receive_buff[2])//停止
+					else if(4==(u3_receive_buff[2]&0x07))//  暂停
 					{
 						
 					}
-					else if(6==u3_receive_buff[2])//暂停
+					else if(5==(u3_receive_buff[2]&0x07))//  恢复
 					{
 					
 					}
-					else if(7==u3_receive_buff[2])//恢复
+					else if(6==(u3_receive_buff[2]&0x07))//停止
 					{
 					
 					}
-					else if(8==u3_receive_buff[2])//重启
+					else if(7==(u3_receive_buff[2]&0x07))//重启
 					{
-					
+						
 					}			 
 			 }
 				

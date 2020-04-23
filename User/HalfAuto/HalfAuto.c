@@ -397,6 +397,7 @@ void BigCarHalfAutoMode(void)
 		PowerOff();
 		if(RelayOffflag==-2)
 		{
+			Up_Data.Status = (Up_Data.Status&0x87)|0x40;//此时的状态值 完成
 			RelayOffflag=-1;
 			WaitFlag=0;      
 			Run_Mode=0;
@@ -409,7 +410,7 @@ void BigCarHalfAutoMode(void)
 		if(RelayOffflag==-2)
 		{
 			ErrorBigCar = HalfAutoStep;//记录出错在哪一步
-			Up_Data.Status =  Up_Data.Status&0xF0;
+			Up_Data.Status =  Up_Data.Status&0x7F;
 			RelayOffflag=-1;
 			HalfAutoStep=0;
 			X_MOVE_BIT=0;//标志位复位

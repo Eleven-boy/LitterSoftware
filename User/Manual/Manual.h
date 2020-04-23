@@ -17,9 +17,10 @@ extern uint8_t HTaskModeFlag;
 
 /************************************************************/
 
-void ManualXMoving(float x);
-void ManualYMoving(float y); 
-void ManualClose(void);
-void ManualOpen(void);
+extern void ManualXMoving(float x);
+extern void ManualYMoving(float y); 
+extern void ManualClose(void);
+extern void ManualOpen(void);
+extern void ManualRaisePawFromLitterPool(void);
 #endif /* __TASK_H */
 

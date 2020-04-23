@@ -10,7 +10,7 @@
  *************************************************************************  
  */
 extern uint8_t WaitFlag;
-
+extern uint8_t Run_Mode;
 
 //手动状态下的运行步骤 1:停止,2:X,3:Y,4:上,4:下,6:抓,7:松,
 uint8_t HTaskModeFlag = 0;
@@ -116,7 +116,6 @@ void ManualYMoving(float y)
 				HTaskModeFlag=0;//无任务模式
 				WaitFlag = 0;//进入等待状态
 				Y_MOVE_BIT = 0;//复位
-				RequestStop(BIG_CAR);
 			}
 		}
 	}
@@ -193,4 +192,101 @@ void ManualOpen(void)
 		}		
 	}	
 }
-
+/*
+*****************************************************************************************************************
+*                                     void ManualRaisePawFromLitterPool(float z)
+*
+*Description : 将爪子从垃圾池抬起
+*Arguments   : none
+*Returns     : none
+*Notes       : none
+*****************************************************************************************************************
+*/
+void ManualRaisePawFromLitterPool(void)
+{
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------
+	
+	if(1==BigClawDataCorrect)//数据正常
+	{
+		if(UP_BIT == 0)//正在运行
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  UpPawFromLitterPool(BURN_POOL_UZ);		
+		}
+		else if(UP_BIT == 1)//正常运行结束
+		{
+			PowerOff();
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				UP_BIT = 0;//复位
+			}
+		}
+		else if(UP_BIT == 2)//运行过程中出错
+		{
+			PowerOff();
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				UP_BIT = 0;//复位
+			}	
+		}
+	}		
+}
+/*
+*****************************************************************************************************************
+*                                    void RisePawFromPlatform(void)
+*
+*Description : 从四楼平台抬升爪子
+*Arguments   : none
+*Returns     : none
+*Notes       : 使用往下射的激光laser.dis1
+*****************************************************************************************************************
+*/
+void ManualRisePawFromPlatform(void)
+{
+	if(1==BigClawDataCorrect)//数据正常
+	{
+		if(UP_BIT == 0)
+		{
+			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
+		  UpPawFromPlatform(PLATFORM_UZ);		
+		}
+		else if(UP_BIT == 1)//正常运行结束
+		{
+			PowerOff();
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				UP_BIT = 0;//复位
+			}
+		}
+		else if(UP_BIT == 2)//运行过程中出错
+		{
+			PowerOff();
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				UP_BIT = 0;//复位
+			}	
+		}
+	}
+}
