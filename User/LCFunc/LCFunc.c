@@ -62,6 +62,8 @@ uint8_t Big_Claw_Up_Delay_Flag = 0;//打开定时器标志位
 int64_t Big_Claw_Up_Delay_Pool = 0;
 uint8_t Big_Claw_Up_Delay_Pool_Flag = 0;
 
+u8 CommunicatDelay = 0;//通讯延迟
+
 Provar BCVar;
 /*
 *****************************************************************************************************************
@@ -151,9 +153,12 @@ void XMoving(float x)
 	{
 		same_dis_count=0;
 	}
-	err_x = laser.dis6-x;
 	
-	if(abs(err_x)>2000)//偏差大于一定范围时，要移动	
+	
+	err_x = laser.dis6-x;
+	laser.last_dis6 = laser.dis6;
+	
+	if((abs(err_x)>2000)&&(laser.dis6>0))//偏差大于一定范围时，要移动	
 	{
 		
 		err_x = laser.dis6 - x;    //24米
@@ -174,7 +179,7 @@ void XMoving(float x)
 		}		
 	}	
 	//大行车X方向开始点动
-	else if(abs(err_x)<2000)//大行车X方向点动模式
+	else if((abs(err_x)<2000)&&(laser.dis6>0))//大行车X方向点动模式
 	{		
 		
 		if(err_x<0)//大行车向南点动
@@ -261,7 +266,7 @@ void YMoving(float y)
 	
 	
 	//大行车Y方向移动
-	if(abs(err_y)>2000)//大行车Y方向移动
+	if((abs(err_y)>2000)&&(laser.dis7>0))//大行车Y方向移动
 	{	
 		//Now is moving to the Y destnation
 		if ((err_y>0))//大行车向东运动
@@ -278,7 +283,7 @@ void YMoving(float y)
 		}	
 	}
 	//大行车Y方向点动
-	else if ((abs(err_y)<2000))//大行车Y方向点动
+	else if ((abs(err_y)<2000)&&(laser.dis7>0))//大行车Y方向点动
 	{	
 		if(err_y<0)//大行车向西点动
 		{
@@ -327,16 +332,27 @@ void UpPawFromBurnPool(float z)
 	float paw_err=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
+	static uint8_t dis8_error_count=0;
 	
 	if (laser.dis8<0)//滤除偶尔出现的错误值
 	{
-		laser.dis8=laser.last_dis8;
+		if(dis8_error_count<10)
+		{
+			dis8_error_count++;
+			laser.dis8=laser.last_dis8;
+		}
+		else//一直出现负值，停止运动出问题了
+		{
+			PAW_UP(OFF);
+			dis8_error_count=0;
+			UP_BIT = 2;			
+		}
 	}				
 	paw_err = laser.dis8 - z; 
 	laser.last_dis8 = laser.dis8;   
 	//大爪上升
 	/*情况1：正常情况运行*/
-	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
+	if((abs(paw_err)>300)&&(laser.dis8>0))//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
 		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		if(paw_err>=0)//大爪上升
@@ -344,10 +360,9 @@ void UpPawFromBurnPool(float z)
 			PAW_UP(ON);	
 		}
 	}
-	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止上升
+	else if((abs(paw_err)<300)&&(laser.dis8>0))//实际距离和期望距离偏差小于0.3米，大爪停止上升
 	{
-		PAW_UP(OFF);	
-		
+		PAW_UP(OFF);			
 		UP_BIT = 1;//上升完成标志位置1
 	}	
 	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
@@ -358,8 +373,7 @@ void UpPawFromBurnPool(float z)
 		if (same_dis_count>5)
 		{
 			PAW_UP(OFF);
-			same_dis_count=0;
-			
+			same_dis_count=0;			
 			UP_BIT = 1;
 		}	
 	}
@@ -382,22 +396,29 @@ void UpPawFromBurnPool(float z)
 void UpPawFromPlatform(float z)
 {
 	float paw_err=0; 
-	float paw_nowDis=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
+	static uint8_t dis1_error_count=0;
 	
 	if (laser.dis1<0)//滤除偶尔出现的错误值
 	{
-		laser.dis1=laser.last_dis1;
-	}				
-	paw_nowDis=laser.dis1;     
-	paw_err = paw_nowDis - z;    
+		if(dis1_error_count<10)
+		{
+			dis1_error_count++;
+			laser.dis1=laser.last_dis1;
+		}
+		else//一直出现负值，停止运动出问题了
+		{
+			PAW_UP(OFF);
+			dis1_error_count=0;
+			UP_BIT = 2;			
+		}
+	}				     
+	paw_err = laser.dis1 - z;    
 	laser.last_dis1 = laser.dis1;   
-		
-	paw_err = laser.dis1 - z;	
 	//大爪上升
 	/*情况1：正常情况运行*/
-	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪上升
+	if((abs(paw_err)>300)&&(laser.dis1>0))//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
 		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		if(paw_err<=0)//大爪上升
@@ -405,10 +426,9 @@ void UpPawFromPlatform(float z)
 			PAW_UP(ON);	
 		}
 	}
-	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止上升
+	else if((abs(paw_err)<300)&&(laser.dis1>0))//实际距离和期望距离偏差小于0.3米，大爪停止上升
 	{
-		PAW_UP(OFF);	
-		
+		PAW_UP(OFF);		
 		UP_BIT = 1;//上升完成标志位置1
 	}	
 	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
@@ -419,8 +439,7 @@ void UpPawFromPlatform(float z)
 		if (same_dis_count>5)
 		{
 			PAW_UP(OFF);
-			same_dis_count=0;
-			
+			same_dis_count=0;		
 			UP_BIT = 1;
 		}	
 	}
@@ -451,11 +470,15 @@ void UpPawFromLitterPool(float z)
 	float paw_err=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
-
+	static uint8_t dis1_error_count=0;
+	static uint8_t dis8_error_count=0;
 
 	if(1==UpOrDown)//在下半部分，用往下射的激光 12米 dis1
 	{
 		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
+		
+		
+		
 		if((laser.dis1>0 && laser.dis1<10000) && laser.dis8<0)
 		{
 			PAW_DOWN(ON);	
@@ -495,8 +518,7 @@ void UpPawFromLitterPool(float z)
 		}
 		else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止上升
 		{
-			PAW_UP(OFF);	
-			
+			PAW_UP(OFF);			
 			UP_BIT = 1;//上升完成标志位置1
 		}	
 		/*情况2：爪子无法上升，但是abs(paw_err)>300*/
@@ -507,8 +529,7 @@ void UpPawFromLitterPool(float z)
 			if (same_dis_count>5)
 			{
 				PAW_UP(OFF);
-				same_dis_count=0;
-				
+				same_dis_count=0;				
 				UP_BIT = 1;
 			}	
 		}
@@ -534,17 +555,29 @@ void DownPawToBurnPool(float z)
 	float paw_err=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
+	static uint8_t dis8_error_count=0;
+
 	
 	if (laser.dis8<0)//滤除偶尔出现的错误值
 	{
-		laser.dis8=laser.last_dis8;
+		if(dis8_error_count<10)
+		{
+			dis8_error_count++;
+			laser.dis8=laser.last_dis8;
+		}
+		else//一直出现负值，停止运动出问题了
+		{
+			PAW_DOWN(OFF);
+			dis8_error_count=0;
+			UP_BIT = 2;			
+		}
 	}				
 	paw_err = laser.dis8 - z; 
 	laser.last_dis8 = laser.dis8;   
 
 	//大爪下降
 	/*情况1：正常情况运行*/
-	if(abs(paw_err)>300)//实际距离和期望距离偏差大于0.3米，大爪下降
+	if((abs(paw_err)>300)&&(laser.dis8>0))//实际距离和期望距离偏差大于0.3米，大爪下降
 	{
 		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down
 		if(paw_err<=0)//大爪下降
@@ -552,7 +585,7 @@ void DownPawToBurnPool(float z)
 			PAW_DOWN(ON);	
 		}
 	}
-	else if(abs(paw_err)<300)//实际距离和期望距离偏差小于0.3米，大爪停止下降
+	else if((abs(paw_err)<300)&&(laser.dis8>0))//实际距离和期望距离偏差小于0.3米，大爪停止下降
 	{
 		PAW_DOWN(OFF);	
 		
@@ -573,8 +606,7 @@ void DownPawToBurnPool(float z)
 		if (same_dis_count>5)
 		{
 			PAW_DOWN(OFF);
-			same_dis_count=0;
-			
+			same_dis_count=0;		
 			DOWN_BIT = 1;
 		}	
 	}
@@ -709,17 +741,29 @@ void DownPawToPlatform(float z)
 	float paw_err=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
+	static uint8_t dis1_error_count=0;
 	
 	if (laser.dis1<0)//滤除偶尔出现的错误值
 	{
 		laser.dis1=laser.last_dis1;
+		if(dis1_error_count<10)
+		{
+			dis1_error_count++;
+			laser.dis1=laser.last_dis1;
+		}
+		else//一直出现负值，停止运动出问题了
+		{
+			PAW_UP(OFF);
+			dis1_error_count=0;
+			UP_BIT = 2;			
+		}
 	}
 	paw_err = laser.dis1 - z;   
 	laser.last_dis1 = laser.dis1;   
 	
   Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down	
 	//大爪下降
-	if(abs(paw_err)>1000)//大爪下降
+	if((abs(paw_err)>1000)&&(laser.dis1>0))//大爪下降
 	{
 		if(paw_err>=0)//大爪下降
 		{
@@ -727,7 +771,7 @@ void DownPawToPlatform(float z)
 		}
 	}
 	//大爪下降到指定高度，准备点动
-	else if(abs(paw_err)<1000)//大爪下降到指定高度，准备点动
+	else if((abs(paw_err)<1000)&&(laser.dis1>0))//大爪下降到指定高度，准备点动
  	{
 		/*情况1：正常情况运行*/
 		if(paw_err>200)//开始点动
@@ -745,8 +789,7 @@ void DownPawToPlatform(float z)
 		/*情况2：在点动时爪子倾斜过大*/
 		if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
 		{
-			PAW_DOWN(OFF);
-			
+			PAW_DOWN(OFF);		
 			PointMove = 0;
 			PointMoveTime = 0;	
 			DOWN_BIT = 1;
@@ -863,17 +906,31 @@ void SelfCheckStatus(void)
 //数据通讯管理
 void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 {
+	float dis1_err = 0.0f;
+	float dis5_err = 0.0f;
+	float dis6_err = 0.0f;
+	float dis7_err = 0.0f;
+	float dis8_err = 0.0f;
+	
 	if(BIG_CAR==task_mode)//请求大行车433
 	{	
 		if(1==OnorOff)
 		{
-			if ((laser.dis6<=0)||(laser.dis7<=0)||(laser.dis5<=0))//判断大行车数据是否正常
+			dis5_err = laser.dis5 - laser.last_dis5;
+			dis6_err = laser.dis6 - laser.last_dis6;
+			dis7_err = laser.dis7 - laser.last_dis7;
+			
+			if ((dis5_err!=0)||(dis6_err!=0)||(dis7_err!=0))//判断大行车数据是否正常
 			{
 				BigCarDataCorrect = 0;
 				RequestStart(BIG_CAR);  //请求大车433发送数据	
 			}	
 			else
 				BigCarDataCorrect = 1;	
+			
+			laser.last_dis5 = laser.dis5;//保存历史值
+			laser.last_dis6 = laser.dis6;
+			laser.last_dis7 = laser.dis7;
 		}
 		else if(0==OnorOff)
 		{
@@ -884,13 +941,18 @@ void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 	{
 		if(1==OnorOff)
 		{
-			if (laser.dis1<=0 && laser.dis8<=0)//判断大爪子数据是否正常
+			dis1_err = laser.dis1 - laser.last_dis1;
+			dis8_err = laser.dis8 - laser.last_dis8;
+			
+			if (dis1_err!=0 || dis8_err!=0)//判断大爪子数据是否正常
 			{
 				BigClawDataCorrect = 0;
 				RequestStart(BIG_CLAW);  //请求大爪433发送数据	
 			}	
 			else
-				BigClawDataCorrect = 1;			
+				BigClawDataCorrect = 1;		
+			laser.last_dis1 = laser.dis1;//保存历史值
+			laser.last_dis8 = laser.dis8;
 		}
 		else if(0==OnorOff)
 		{

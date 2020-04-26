@@ -3,7 +3,7 @@
   * @file    main.c
   * @author  yueran
   * @version V1.0 裸机
-  * @date    2020-04-18
+  * @date    2020-04-25
   * @brief   无锡固废项目--大爪子
   *****************************************************************************
   * @attention
@@ -66,6 +66,11 @@ int main(void)
 	SysTick_Init();                 //系统时钟初始化
   BSP_Init();                     //相关硬件初始化 
 	
+	laser.last_dis5 = laser.dis5;//保存历史值
+	laser.last_dis6 = laser.dis6;
+	laser.last_dis7 = laser.dis7;
+	laser.last_dis1 = laser.dis1;//保存历史值
+	laser.last_dis8 = laser.dis8;	
 	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
 	{
 		DataCommunicateManage(BIG_CLAW,1);//请求数据
@@ -74,12 +79,12 @@ int main(void)
 	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
 	//初始值
-//	target.x[0] = 13000;
-//	target.y[0] = 4000; 
-//	target.z[0] = 1600; 
-//	origin.x[0] = 7900; 
-//	origin.y[0] = 4000; 
-//	origin.z[0] = 1700;  
+	//	target.x[0] = 13000;
+	//	target.y[0] = 4000; 
+	//	target.z[0] = 1600; 
+	//	origin.x[0] = 7900; 
+	//	origin.y[0] = 4000; 
+	//	origin.z[0] = 1700;  
 
   //SelfCheckStatus();//开机启动自检程序
 	
@@ -112,22 +117,22 @@ int main(void)
 							ManualYMoving(target.y[0]);
 							break;
 						case 3: //从料坑上升
-							
+							ManualRaisePawFromLitterPool(BURN_POOL_UZ);
 							break;				
 						case 4: //从焚烧池上升
-							
+							ManualRisePawFromBurnPool(BURN_POOL_UZ);
 							break;
 						case 5: //从平台上升
-							
+							ManualRisePawFromPlatform(PLATFORM_UZ);
 							break;	
 						case 6: //下降到垃圾池
-							
+							ManualDowntoLitterPool(BIG_CLAW_BASE_DIS);
 							break;		
 						case 7: //下降到焚料池
-							
+							ManualDownClawtoBurnPool(BURN_POOL_DZ);
 							break;
 						case 8: //下降到平台
-							
+							ManualDownToOrigin(ORIGIN_Z);
 							break;		
 						case 9: //抓料
 							ManualClose();
@@ -155,10 +160,11 @@ int main(void)
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//100ms上传一次数据		
-				Up_Data_Flag=0;				
+				Up_Data_Flag = 0;			
+				CommunicatDelay = 0;				
 			}
 			//出错报警
-			if(!ErrorBigCar)
+			if((!ErrorBigCar)||(1==ManualError))
 			{
 				ALARM_ON;
 			}

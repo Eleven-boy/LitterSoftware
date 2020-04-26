@@ -50,6 +50,7 @@ extern uint8_t PointMove;
 extern int PointMoveTime;
 extern uint8_t UpOrDown;
 extern uint8_t ErrorBigCar;
+extern uint8_t ManualError;
 //1：表示合拢
 extern uint8_t CloseFlag;
 //合拢延时
@@ -64,6 +65,8 @@ extern uint8_t Big_Claw_Up_Delay_Flag;//打开定时器标志位
 
 extern int64_t Big_Claw_Up_Delay_Pool;
 extern uint8_t Big_Claw_Up_Delay_Pool_Flag;
+
+extern u8 CommunicatDelay;
 
 //暂停时需要保护的变量
 typedef struct

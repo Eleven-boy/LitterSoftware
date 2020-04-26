@@ -158,7 +158,7 @@ void BigCarFullAutoMode(void)
 			Run_Mode=0;
 		}
 	}
-	if((2==X_MOVE_BIT)||(2==Y_MOVE_BIT)||(2==DOWN_BIT)||(2==UP_BIT))//运行出错
+	if((2==X_MOVE_BIT)||(2==Y_MOVE_BIT)||(2==DOWN_BIT)||(2==UP_BIT)||(CommunicatDelay>4))//运行出错
 	{
 		PowerOff();
 		if(RelayOffflag==-2)
