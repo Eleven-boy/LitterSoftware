@@ -52,9 +52,9 @@ uint8_t uart_cmd;
 
 
 static void bsp_initUSART(u32 bound);
-static void USART_DMA_RxConfig(void);
+static void USART1_DMA_RxConfig(void);
 static void USART_RX_DMAReset(void);
-static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize);
+static void USART1_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize);
 
 void USART1_Init(u32 bound)
 {
@@ -103,8 +103,8 @@ static void bsp_initUSART(u32 bound)
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_Init(USARTx, &USART_InitStructure);
 	
-	USART_DMA_RxConfig();                                                                       //配置DMA
-	USART_DMA_Tx_init(0,10);                                                                    //配置发送DMA
+	USART1_DMA_RxConfig();                                                                       //配置DMA
+	USART1_DMA_Tx_init(0,10);                                                                    //配置发送DMA
 	/* 使能 USART DMA RX 请求 */
 	USART_DMACmd(USARTx, USART_DMAReq_Rx, ENABLE);
 
@@ -131,7 +131,7 @@ static void bsp_initUSART(u32 bound)
 	
 }
 
-static void USART_DMA_RxConfig(void)
+static void USART1_DMA_RxConfig(void)
 {
 	DMA_InitTypeDef  DMA_InitStructure;
 	/* 
@@ -164,7 +164,9 @@ static void USART_DMA_RxConfig(void)
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory ;     /* 设置从外设到内存 */
 	DMA_InitStructure.DMA_Memory0BaseAddr =(uint32_t)u1_receive_buff ; /* 设置内存地址 */
 	DMA_Init(USART_RX_DMA,&DMA_InitStructure);
-	
+
+
+
 	/* 使能 DMA USART RX Stream */
 	DMA_Cmd(USART_RX_DMA, ENABLE);
 }
@@ -195,10 +197,11 @@ static void USART_DMA_RxConfig(void)
 #define DMA_Stream7_IT_MASK     (uint32_t)(DMA_Stream3_IT_MASK | (uint32_t)0x20000000)
 
 
-static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
+static void USART1_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
 {
 	DMA_InitTypeDef  DMA_InitStructure;
 	
+
 	/* 复位 DMA Stream 寄存器 (用于调试目的) */
  	/* DMA_DeInit(USARTx_TX_DMA_STREAM); */
 
@@ -230,6 +233,8 @@ static void USART_DMA_Tx_init(uint32_t *BufferSRC, uint32_t BufferSize)
 	DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral ;     /* 设置从内存到外设 */
 	DMA_InitStructure.DMA_Memory0BaseAddr =(uint32_t)BufferSRC ; /* 设置内存地址 */
 	DMA_Init(USART_TX_DMA,&DMA_InitStructure);
+
+	
 	/* 使能发送传输完成中断 */
 	//DMA_ITConfig(USART_TX_DMA, DMA_IT_TC, ENABLE);  		
 	/* 使能 DMA USART TX Stream */
@@ -350,7 +355,6 @@ void RequestStopToBigCar(void)
 	}	
 }
 
-
 //请求大车433开始发送指令
 void RequestStartToBigCar(void)
 {
@@ -358,7 +362,8 @@ void RequestStartToBigCar(void)
 	{
 			uart1_tx_task(send_request_to_xxx[BIG_CAR],1);
 			delay_ms(200);		
-	}	
+	}
+	
 }
 
 #define BYTE0(dwTemp)       (*(char *)(&dwTemp))      

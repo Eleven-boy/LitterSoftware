@@ -132,29 +132,29 @@ void ReleasePaw(void)
 void XMoving(float x)
 {
 	float err_x = 0;
-	static uint8_t same_dis_count=0;
+//	static uint8_t same_dis_count=0;
+	static uint8_t dis6_error_count=0;
 	
 	if (laser.dis6<0)//滤除偶尔出现的错误值
 	{
-		if(same_dis_count<10)
+		if(dis6_error_count<10)
 		{
-			same_dis_count++;
+			dis6_error_count++;
 			laser.dis6=laser.last_dis6;
 		}
 		else//一直出现负值，停止运动出问题了
 		{
 			CAR_NORTH(OFF);
 			CAR_SOUTH(OFF);
-			same_dis_count=0;
+			dis6_error_count=0;
 			X_MOVE_BIT = 2;			
 		}
 	}		
 	else
 	{
-		same_dis_count=0;
+		dis6_error_count=0;
 	}
-	
-	
+
 	err_x = laser.dis6-x;
 	laser.last_dis6 = laser.dis6;
 	
@@ -240,26 +240,27 @@ void XMoving(float x)
 void YMoving(float y)
 {
 	float err_y = 0;
-	static uint8_t same_dis_count=0;
+//	static uint8_t same_dis_count=0;
+	static uint8_t dis7_error_count=0;
 	
 	if (laser.dis7<0)//滤除偶尔出现的错误值
 	{
-		if(same_dis_count<10)
+		if(dis7_error_count<10)
 		{
-			same_dis_count++;
+			dis7_error_count++;
 			laser.dis7=laser.last_dis7;
 		}
 		else//一直出现负值，停止运动出问题了
 		{
 			CAR_WEST(OFF);
 			CAR_EAST(OFF);
-			same_dis_count=0;
+			dis7_error_count=0;
 			Y_MOVE_BIT = 2;			
 		}
 	}		
 	else
 	{
-		same_dis_count=0;
+		dis7_error_count=0;
 	}
 	err_y = laser.dis7-y;
 	laser.last_dis7 = laser.dis7;   	
@@ -477,8 +478,6 @@ void UpPawFromLitterPool(float z)
 	{
 		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
 		
-		
-		
 		if((laser.dis1>0 && laser.dis1<10000) && laser.dis8<0)
 		{
 			PAW_DOWN(ON);	
@@ -637,6 +636,7 @@ void DownPawToLitterPool(float z)
 	float paw_err=0; 
 	float paw_err_last=0;
 	static uint8_t same_dis_count=0;
+	static uint8_t dis1_error_count=0;
 	
 	if(0==UpOrDown)//用往上射的激光  24米  dis8
 	{		
@@ -645,6 +645,7 @@ void DownPawToLitterPool(float z)
 		{
 			PAW_DOWN(ON);	
 		}
+		
 		if (laser.dis8<0 && laser.dis1>0)
 		{
 			same_dis_count = same_dis_count+1;			
@@ -664,7 +665,17 @@ void DownPawToLitterPool(float z)
 	{
 		if (laser.dis1<0)//滤除偶尔出现的错误值
 		{
-			laser.dis1=laser.last_dis1;
+			if(dis1_error_count<10)
+			{
+				dis1_error_count++;
+				laser.dis1=laser.last_dis1;
+			}
+			else//一直出现负值，停止运动出问题了
+			{
+				PAW_DOWN(OFF);
+				dis1_error_count=0;
+				DOWN_BIT = 2;			
+			}
 		}				
 		paw_err = laser.dis1 - z;   
 		laser.last_dis1 = laser.dis1;   

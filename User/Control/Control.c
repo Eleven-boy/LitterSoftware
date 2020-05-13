@@ -28,24 +28,16 @@ extern uint8_t Up_Data_Flag;
 void control_task(void)
 {
 
-	task_tim.time_1ms++;
-	task_tim.time_2ms++;	
-	task_tim.time_5ms++;
 	task_tim.time_10ms++;	
 	task_tim.time_25ms++;
 	task_tim.time_100ms++;	
+	task_tim.time_200ms++;	
 	task_tim.time_1000ms++;	
 	
 
-
-	if(task_tim.time_5ms >= 10)
+	if(task_tim.time_10ms >= 20)
 	{
-	  task_tim.time_5ms -= 10;
-
-	}
-	else if(task_tim.time_10ms >= 20)
-	{
-	  task_tim.time_10ms -= 20;
+	  
 	}
 	else if(task_tim.time_25ms >= 50)
 	{
@@ -53,6 +45,7 @@ void control_task(void)
 	}
 	else if(task_tim.time_100ms >= 200)
 	{	
+		//LED1_TOGGLE;
 	  task_tim.time_100ms -= 200;
 		if((ReverseStop == 1)||(ReverseStop == 2))//反向制动计时
 		{
@@ -89,8 +82,14 @@ void control_task(void)
 			CommunicatDelay++;
 		}
 	}
+	else if(task_tim.time_200ms >= 400)
+	{
+		
+		
+	}
 	else if(task_tim.time_1000ms >= 2000)
 	{
+		
 	  task_tim.time_1000ms -= 2000;
 //    if (1==Big_Claw_Up_Delay_Flag)
 //    {

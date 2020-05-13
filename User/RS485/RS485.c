@@ -5,24 +5,24 @@
 *Description   :Design for RS485
 ******************************************************************************************************************
 */
-
 #include "usart3.h"
 #include "RS485.h"
 #include "GPIO.h"
 #include "CRC.h"
 #include "Data_type.h"   
+#include "bsp_SysTick.h"
 /*
 ******************************************************************************************************************
 *                                            CONSTANTS & MACROS
 ******************************************************************************************************************
 */
-#define RS485_DE 		                     PAout(1)
+
 #define RS485_DE_PIN                     GPIO_Pin_1            
 #define RS485_DE_GPIO_PORT               GPIOA                      
 #define RS485_DE_GPIO_CLK                RCC_AHB1Periph_GPIOA
 #define RS485_DE_SOURCE                  GPIO_PinSource1
 
-#define RS485_RE 		                     PAout(2)
+
 #define RS485_RE_PIN                     GPIO_Pin_2           
 #define RS485_RE_GPIO_PORT               GPIOA                      
 #define RS485_RE_GPIO_CLK                RCC_AHB1Periph_GPIOA
@@ -71,11 +71,14 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 	u8 _cnt = 0,c_cnt = 0;
 	u8 i = 0;
 	u16 CRC_NUM = 0;
-	u8 Send_DATA[100];
-	u8 valid_data[100];
+	u8 Send_DATA[100]={0};
+	u8 valid_data[100]={0};
 	
+	Up_Data.Add = 0xAA;
 	
 	Send_DATA[_cnt++]  = Up_Data.Add;  //地址码
+	
+	_cnt++;                                 //空一个，用来存放发送的总字节数
 	
 	Send_DATA[_cnt++]  = BYTE3(Up_Data.P_x);//x坐标
 	Send_DATA[_cnt++]  = BYTE2(Up_Data.P_x);
@@ -100,11 +103,15 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 	Send_DATA[_cnt++]  = Up_Data.Status;    //行车运行状态
 	
 	//CRC校验
-	for(c_cnt=1;c_cnt < _cnt;c_cnt++) valid_data[i++] = Send_DATA[c_cnt];
+	for(c_cnt=2;c_cnt < _cnt;c_cnt++) valid_data[i++] = Send_DATA[c_cnt];
 	CRC_NUM = CRC16(valid_data,i);
 
 	Send_DATA[_cnt++] = BYTE1(CRC_NUM);
-	Send_DATA[_cnt++] = BYTE0(CRC_NUM);
+	Send_DATA[_cnt++]	= BYTE0(CRC_NUM);
+	
+	Send_DATA[_cnt++] = 0xEE;//结束符
+	
+	Send_DATA[2] = _cnt;//发送数据的总字节数
 	
 	RS485_DE = 1;
 	RS485_RE = 0;
@@ -112,10 +119,10 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 //	DMA1_Stream7->NDTR = BufferSize;    		    //配置BUFFER大小
 //	DMA1_Stream7->M0AR = (uint32_t)BufferSRC;   //配置地址
 //	DMA1_Stream7->CR |= DMA_SxCR_EN;			      //打开DMA,开始发送
-	USART3_DMA_TxConfig((uint32_t*)Send_DATA, _cnt);
-	//delay_ms(1);
-	RS485_DE = 0;
-	RS485_RE = 1;
+	USART3_DMA_TxConfig(Send_DATA, _cnt);
+//	delay_ms(1);
+//	RS485_DE = 0;
+//	RS485_RE = 1;
 	
 }
 

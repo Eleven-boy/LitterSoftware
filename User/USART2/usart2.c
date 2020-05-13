@@ -16,16 +16,16 @@ char u2_receive_buff[U2_BUFFSIZERECE] = {0};
 #define USARTx_IRQn                      USART2_IRQn
 #define USARTx_IRQHandler                USART2_IRQHandler
 
-#define USARTx_TX_PIN                    GPIO_Pin_2              
-#define USARTx_TX_GPIO_PORT              GPIOA                       
-#define USARTx_TX_GPIO_CLK               RCC_AHB1Periph_GPIOA
-#define USARTx_TX_SOURCE                 GPIO_PinSource2
+#define USARTx_TX_PIN                    GPIO_Pin_5              
+#define USARTx_TX_GPIO_PORT              GPIOD                       
+#define USARTx_TX_GPIO_CLK               RCC_AHB1Periph_GPIOD
+#define USARTx_TX_SOURCE                 GPIO_PinSource5
 #define USARTx_TX_AF                     GPIO_AF_USART2
 
-#define USARTx_RX_PIN                    GPIO_Pin_3         
-#define USARTx_RX_GPIO_PORT              GPIOA                    
-#define USARTx_RX_GPIO_CLK               RCC_AHB1Periph_GPIOA
-#define USARTx_RX_SOURCE                 GPIO_PinSource3
+#define USARTx_RX_PIN                    GPIO_Pin_6         
+#define USARTx_RX_GPIO_PORT              GPIOD                    
+#define USARTx_RX_GPIO_CLK               RCC_AHB1Periph_GPIOD
+#define USARTx_RX_SOURCE                 GPIO_PinSource6
 #define USARTx_RX_AF                     GPIO_AF_USART2
 
 #define USARTx_DMA                       DMA1

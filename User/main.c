@@ -60,17 +60,21 @@ POSITION target;//目标位置
  *************************************************************************  
  */
 void BSP_Init(void);
+
 int main(void)
 {	
 	//uint8_t Choice = 0;
 	SysTick_Init();                 //系统时钟初始化
   BSP_Init();                     //相关硬件初始化 
 	
+	LED = 1;
+		
 	laser.last_dis5 = laser.dis5;//保存历史值
 	laser.last_dis6 = laser.dis6;
 	laser.last_dis7 = laser.dis7;
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
+	
 	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
 	{
 		DataCommunicateManage(BIG_CLAW,1);//请求数据
@@ -92,6 +96,7 @@ int main(void)
   { 
 		if(task_tim.time_10ms >= 20)//运行任务每次10ms
 		{
+			
 			if(1 == WaitFlag)//已收到上位机传来数据
 			{				
 				//ChoseTask(Choice);
@@ -153,21 +158,24 @@ int main(void)
 					BigCarFullAutoMode();
 				}
 			}
+			task_tim.time_10ms -= 20;
 		}
 		
-		if(task_tim.time_100ms >= 200)//100ms发送
+		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-			if(1==Up_Data_Flag)
-			{
-				RS485_Send_Data();//100ms上传一次数据		
+			  LED1_TOGGLE;
+//			if(1==Up_Data_Flag)
+//			{
+				RS485_Send_Data();//200ms上传一次数据		
 				Up_Data_Flag = 0;			
 				CommunicatDelay = 0;				
-			}
+//			}
 			//出错报警
 			if((!ErrorBigCar)||(1==ManualError))
 			{
 				ALARM_ON;
 			}
+			task_tim.time_200ms -= 400;
 		}
 	}	 
 }

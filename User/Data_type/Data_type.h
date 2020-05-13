@@ -83,10 +83,15 @@ typedef struct
 	u16 time_10ms; 														//
 	u16	time_25ms;	                          //
 	u16 time_100ms;                           //
+	u16 time_200ms;
 	u16 time_1000ms;                           //
 } Task_loop_t;
 extern Task_loop_t task_tim;
 
+typedef struct{
+	int count;//请求次数
+	int delayms;//间隔时间
+}UART_REQUEST_433; 
 //设备号
 enum Dev_Obj
 {
