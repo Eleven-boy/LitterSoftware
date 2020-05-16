@@ -216,10 +216,14 @@ void USARTx_IRQHandler(void)
 	{		
 		 USART_ReceiveData(USARTx);                       
 		 uint8_t Uart1_Rec_Len = U4_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			
-	   UART4_RX_DMAReset();
+	   UART4_RX_DMAReset();	
 		 //数据帧处理
-		
-		 //直接在中断中接收处理数据 				
+//		 if(u4_receive_buff[0]==0xAB && u4_receive_buff[1] == 0x00)
+//		 {
+//			LED1_TOGGLE;	
+//		 }
+		 //直接在中断中接收处理数据 	
+			 
 	}
 	else if(USART_GetITStatus(USARTx, USART_IT_TC) == SET)
 	{

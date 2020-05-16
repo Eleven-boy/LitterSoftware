@@ -165,8 +165,6 @@ static void USART1_DMA_RxConfig(void)
 	DMA_InitStructure.DMA_Memory0BaseAddr =(uint32_t)u1_receive_buff ; /* 设置内存地址 */
 	DMA_Init(USART_RX_DMA,&DMA_InitStructure);
 
-
-
 	/* 使能 DMA USART RX Stream */
 	DMA_Cmd(USART_RX_DMA, ENABLE);
 }

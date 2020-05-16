@@ -5,13 +5,6 @@
 
 #define U4_BUFFSIZERECE  100
 #define U4_BUFFSIZESEND  100
-extern int Openmv_Down_Dis_F;
-extern int Openmv_Down_Dis_B;
-extern int Openmv_Down_RTDis_F;
-extern int Openmv_Down_RTDis_B;
-extern u8 hoe_down;
-extern u8 hoe_up;
-extern u8 slow_down;
 extern char u4_receive_buff[U4_BUFFSIZERECE];
 typedef union
 {

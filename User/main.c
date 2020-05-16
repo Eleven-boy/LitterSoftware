@@ -60,7 +60,7 @@ POSITION target;//目标位置
  *************************************************************************  
  */
 void BSP_Init(void);
-
+char a[3] = {0xAB,0,0};
 int main(void)
 {	
 	//uint8_t Choice = 0;
@@ -163,13 +163,14 @@ int main(void)
 		
 		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-			  LED1_TOGGLE;
-//			if(1==Up_Data_Flag)
-//			{
+			
+			if(1==Up_Data_Flag)
+			{
 				RS485_Send_Data();//200ms上传一次数据		
 				Up_Data_Flag = 0;			
-				CommunicatDelay = 0;				
-//			}
+				CommunicatDelay = 0;	
+							
+			}
 			//出错报警
 			if((!ErrorBigCar)||(1==ManualError))
 			{
@@ -191,7 +192,7 @@ void BSP_Init(void)
 	USART1_Init(115200);            //USART1初始化(接收传感器的433)
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
 	RS485_Init(115200);             //RS485初始化
-	//UART4_Init(115200);	            //UART4初始化(用于调试用)
+	UART4_Init(115200);	            //UART4初始化(用于调试用)
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
 }
 
