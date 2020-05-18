@@ -66,8 +66,7 @@ int main(void)
 	//uint8_t Choice = 0;
 	SysTick_Init();                 //系统时钟初始化
   BSP_Init();                     //相关硬件初始化 
-	
-	LED = 1;
+
 		
 	laser.last_dis5 = laser.dis5;//保存历史值
 	laser.last_dis6 = laser.dis6;
@@ -75,11 +74,11 @@ int main(void)
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
 	
-	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
-	{
-		DataCommunicateManage(BIG_CLAW,1);//请求数据
-		DataCommunicateManage(BIG_CAR,1);//请求数据
-	}
+//	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
+//	{
+//		DataCommunicateManage(BIG_CLAW,1);//请求数据
+//		DataCommunicateManage(BIG_CAR,1);//请求数据
+//	}
 	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
 	//初始值
@@ -92,8 +91,32 @@ int main(void)
 
   //SelfCheckStatus();//开机启动自检程序
 	
+		CAR_EAST(ON);
+		CAR_WEST(ON);
+		CAR_SOUTH(ON);
+		CAR_NORTH(ON);
+		PAW_UP(ON);
+		PAW_DOWN(ON);
+		PAW_CLOSE(ON);
+		PAW_RELEASE(ON);
+		CAR_STOP(ON);
+		delay_ms(1000);	
+		CAR_EAST(OFF);
+		CAR_WEST(OFF);
+		CAR_SOUTH(OFF);
+		CAR_NORTH(OFF);	
+		PAW_UP(OFF);	
+		PAW_DOWN(OFF);
+		PAW_CLOSE(OFF);
+		PAW_RELEASE(OFF);		
+		CAR_STOP(OFF);
+		delay_ms(1000);	
+	
 	while(1) 
   { 
+
+		
+		
 		if(task_tim.time_10ms >= 20)//运行任务每次10ms
 		{
 			
@@ -178,6 +201,8 @@ int main(void)
 			}
 			task_tim.time_200ms -= 400;
 		}
+	
+		
 	}	 
 }
 
