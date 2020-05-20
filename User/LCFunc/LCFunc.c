@@ -931,7 +931,7 @@ void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 			dis6_err = laser.dis6 - laser.last_dis6;
 			dis7_err = laser.dis7 - laser.last_dis7;
 			
-			if ((dis5_err!=0)||(dis6_err!=0)||(dis7_err!=0))//判断大行车数据是否正常
+			if ((dis5_err==0)||(dis6_err==0)||(dis7_err==0))//判断大行车数据是否正常
 			{
 				BigCarDataCorrect = 0;
 				RequestStart(BIG_CAR);  //请求大车433发送数据	
@@ -955,7 +955,7 @@ void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 			dis1_err = laser.dis1 - laser.last_dis1;
 			dis8_err = laser.dis8 - laser.last_dis8;
 			
-			if (dis1_err!=0 || dis8_err!=0)//判断大爪子数据是否正常
+			if (dis1_err ==0.0f || dis8_err ==0.0f)//判断大爪子数据是否正常
 			{
 				BigClawDataCorrect = 0;
 				RequestStart(BIG_CLAW);  //请求大爪433发送数据	

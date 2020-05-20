@@ -3,7 +3,7 @@
 *********************************************************************************************/
 #include "usart1.h"
 #include "Data_type.h"
-
+#include "bsp_led.h" 
 #define U1_BUFFSIZERECE  100
 #define U1_BUFFSIZESEND  100
 
@@ -287,12 +287,15 @@ static void USART_RX_DMAReset(void)
 }	
 
 //进中断
-int sum;
+u8 sum;
+int len1,len2=0;
 void USARTx_IRQHandler(void)
 {	
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       //当接收到数据完成
 	{
 		 USART_ReceiveData(USARTx);                         //读取数据 注意：这句必须要，否则不能够清除中断标志位。
+				 len1 = U1_BUFFSIZERECE;
+		 len2 = DMA_GetCurrDataCounter(USART_RX_DMA);
 		 uint8_t Uart1_Rec_Len = U1_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			//算出接本帧数据长度
 	   USART_RX_DMAReset();
 		 //数据帧处理
@@ -306,6 +309,7 @@ void USARTx_IRQHandler(void)
 					}
 					if(u1_receive_buff[7] == sum)
 					{
+						LED1_TOGGLE;
 						laser.sampleval5 = (u1_receive_buff[2]<<8|u1_receive_buff[1]);
 						laser.sampleval6 = (u1_receive_buff[4]<<8|u1_receive_buff[3]);	
 						laser.sampleval7 = (u1_receive_buff[6]<<8|u1_receive_buff[5]);	

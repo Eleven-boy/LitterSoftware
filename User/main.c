@@ -60,7 +60,7 @@ POSITION target;//目标位置
  *************************************************************************  
  */
 void BSP_Init(void);
-char a[3] = {0xAB,0,0};
+char a[6] = {0x00,0x02,0x0A,0x02,0x12,0x11};
 int main(void)
 {	
 	//uint8_t Choice = 0;
@@ -74,11 +74,11 @@ int main(void)
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
 	
-//	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
-//	{
-//		DataCommunicateManage(BIG_CLAW,1);//请求数据
-//		DataCommunicateManage(BIG_CAR,1);//请求数据
-//	}
+	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
+	{
+		DataCommunicateManage(BIG_CLAW,1);//请求数据
+		DataCommunicateManage(BIG_CAR,1);//请求数据
+	}
 	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
 	//初始值
@@ -111,12 +111,13 @@ int main(void)
 		PAW_RELEASE(OFF);		
 		CAR_STOP(OFF);
 		delay_ms(1000);	
+
+
 	
 	while(1) 
-  { 
-
+  { 	
 		
-		
+//		USART1_DMA_TxConfig((u32*)a,6);
 		if(task_tim.time_10ms >= 20)//运行任务每次10ms
 		{
 			
@@ -184,15 +185,14 @@ int main(void)
 			task_tim.time_10ms -= 20;
 		}
 		
-		if(task_tim.time_200ms >= 400)//200ms发送
+		if(task_tim.time_200ms >= 4000)//200ms发送
 		{
-			
+			//USART2_DMA_TxConfig((u32*)a,6);
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//200ms上传一次数据		
 				Up_Data_Flag = 0;			
-				CommunicatDelay = 0;	
-							
+				CommunicatDelay = 0;								
 			}
 			//出错报警
 			if((!ErrorBigCar)||(1==ManualError))
@@ -213,7 +213,7 @@ void BSP_Init(void)
 	ADC_DMA_Init();                 //ADC_DMA初始化
 	Alarm_GPIO_Init();              //报警端口初始化
 	Relay_GPIO_Init();              //继电器端口初始化
-	EXTI10_Init();                  //外部中断初始化(用于紧急停止按钮 )
+	EXTIX_Init();                  //外部中断初始化(用于紧急停止按钮 )
 	USART1_Init(115200);            //USART1初始化(接收传感器的433)
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
 	RS485_Init(115200);             //RS485初始化
