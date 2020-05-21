@@ -61,6 +61,7 @@ POSITION target;//目标位置
  */
 void BSP_Init(void);
 char a[6] = {0x00,0x02,0x0A,0x02,0x12,0x11};
+int adc1,adc2;
 int main(void)
 {	
 	//uint8_t Choice = 0;
@@ -74,11 +75,11 @@ int main(void)
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
 	
-	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
-	{
-		DataCommunicateManage(BIG_CLAW,1);//请求数据
-		DataCommunicateManage(BIG_CAR,1);//请求数据
-	}
+//	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
+//	{
+//		DataCommunicateManage(BIG_CLAW,1);//请求数据
+//		DataCommunicateManage(BIG_CAR,1);//请求数据
+//	}
 	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
 	//初始值
@@ -90,34 +91,12 @@ int main(void)
 	//	origin.z[0] = 1700;  
 
   //SelfCheckStatus();//开机启动自检程序
-	
-		CAR_EAST(ON);
-		CAR_WEST(ON);
-		CAR_SOUTH(ON);
-		CAR_NORTH(ON);
-		PAW_UP(ON);
-		PAW_DOWN(ON);
-		PAW_CLOSE(ON);
-		PAW_RELEASE(ON);
-		CAR_STOP(ON);
-		delay_ms(1000);	
-		CAR_EAST(OFF);
-		CAR_WEST(OFF);
-		CAR_SOUTH(OFF);
-		CAR_NORTH(OFF);	
-		PAW_UP(OFF);	
-		PAW_DOWN(OFF);
-		PAW_CLOSE(OFF);
-		PAW_RELEASE(OFF);		
-		CAR_STOP(OFF);
-		delay_ms(1000);	
+
 
 
 	
 	while(1) 
-  { 	
-		
-//		USART1_DMA_TxConfig((u32*)a,6);
+  { 		
 		if(task_tim.time_10ms >= 20)//运行任务每次10ms
 		{
 			
@@ -185,9 +164,10 @@ int main(void)
 			task_tim.time_10ms -= 20;
 		}
 		
-		if(task_tim.time_200ms >= 4000)//200ms发送
+		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-			//USART2_DMA_TxConfig((u32*)a,6);
+			adc1 = 5.0f*((ADC_Converted_Buff[0]*3300.0f)/4096.0f)-3000.0f;
+			adc2 = 5.0f*((ADC_Converted_Buff[1]*3300.0f)/4096.0f)-3000.0f;
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//200ms上传一次数据		

@@ -280,10 +280,9 @@ void USARTx_IRQHandler(void)
 		
 		 //数据帧处理
 		 if(0xAB == u3_receive_buff[0])//地址码
-		 {
-			 
+		 {			 
 			 Up_Data_Flag = 1;
-			 /*
+			 
 			 //CRC校验
 			 for(int j = 1;j<u3_receive_buff[1]-2;j++)
 					valid_data[i++] = u3_receive_buff[j];
@@ -349,8 +348,8 @@ void USARTx_IRQHandler(void)
 					}			 
 			 }
 				
-				Up_Data_Flag = 1;
-				*/
+			Up_Data_Flag = 1;
+				
 		 }
 		
 		 //直接在中断中接收处理数据 
