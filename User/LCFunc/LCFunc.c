@@ -11,6 +11,7 @@
 #include "usart1.h"
 #include "usart2.h"
 #include "relay.h"
+#include "bsp_led.h"
 
  /*
  *************************************************************************
@@ -325,19 +326,19 @@ void YMoving(float y)
 *Description : 爪子上升程序（焚料池上上升），用大爪往上射的激光
 *Arguments   : float z：激光距屋顶的高度
 *Returns     : none
-*Notes       : 此时用激光laser.dis8
+*Notes       : 此时用激光laser.dis8    情况2：需要现场微调
 *****************************************************************************************************************
 */
 void UpPawFromBurnPool(float z)
 {
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis8_error_count=0;
 	
 	if (laser.dis8<0)//滤除偶尔出现的错误值
 	{
-		if(dis8_error_count<10)
+		if(dis8_error_count<100)
 		{
 			dis8_error_count++;
 			laser.dis8=laser.last_dis8;
@@ -359,6 +360,7 @@ void UpPawFromBurnPool(float z)
 		if(paw_err>=0)//大爪上升
 		{
 			PAW_UP(ON);	
+			LED1_TOGGLE;
 		}
 	}
 	else if((abs(paw_err)<300)&&(laser.dis8>0))//实际距离和期望距离偏差小于0.3米，大爪停止上升
@@ -367,11 +369,11 @@ void UpPawFromBurnPool(float z)
 		UP_BIT = 1;//上升完成标志位置1
 	}	
 	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
-	if (abs(paw_err-paw_err_last)<100)//处理已经上升到限位的情况
+	if (abs(paw_err-paw_err_last)<50)//处理已经上升到限位的情况   此处的距离和累计次数需要微调
 	{
 		same_dis_count = same_dis_count+1;
 		
-		if (same_dis_count>5)
+		if (same_dis_count>100)
 		{
 			PAW_UP(OFF);
 			same_dis_count=0;			
@@ -391,13 +393,14 @@ void UpPawFromBurnPool(float z)
 *Description : 爪子上升程序（从五楼平台上升）（用下面激光）
 *Arguments   : float z：激光距四楼平台的高度
 *Returns     : none
-*Notes       : 此时用激光laser.dis1
+*Notes       : 此时用激光laser.dis1    情况2：需要现场微调
 *****************************************************************************************************************
 */
+float aaerr = 0;
 void UpPawFromPlatform(float z)
 {
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis1_error_count=0;
 	
@@ -411,7 +414,7 @@ void UpPawFromPlatform(float z)
 		else//一直出现负值，停止运动出问题了
 		{
 			PAW_UP(OFF);
-			dis1_error_count=0;
+			dis1_error_count = 0;
 			UP_BIT = 2;			
 		}
 	}				     
@@ -433,11 +436,11 @@ void UpPawFromPlatform(float z)
 		UP_BIT = 1;//上升完成标志位置1
 	}	
 	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
-	if (abs(paw_err-paw_err_last)<100)//处理已经上升到限位的情况
+	if (abs(paw_err-paw_err_last)<50)//处理已经上升到限位的情况  此处的距离和累计次数需要微调
 	{
 		same_dis_count = same_dis_count+1;
 		
-		if (same_dis_count>5)
+		if (same_dis_count>100)
 		{
 			PAW_UP(OFF);
 			same_dis_count=0;		
@@ -546,13 +549,13 @@ void UpPawFromLitterPool(float z)
 *Description : 爪子下降程序（下降到焚料池），用大爪往上射的激光
 *Arguments   : float z：激光距屋顶的高度
 *Returns     : none
-*Notes       : 此时用激光laser.dis8
+*Notes       : 此时用激光laser.dis8    情况3：此处需要微调
 *****************************************************************************************************************
 */
 void DownPawToBurnPool(float z)
 {
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis8_error_count=0;
 
@@ -598,11 +601,11 @@ void DownPawToBurnPool(float z)
 		DOWN_BIT = 1;
 	} 		
 	/*情况3：爪子无法下降，但是绳索仍然下降*/
-	if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+	if (abs(paw_err-paw_err_last)<50)//处理已经下降到底部，但还在下降的情况  此处的距离和累计次数需要微调
 	{
 		same_dis_count = same_dis_count+1;
 		
-		if (same_dis_count>5)
+		if (same_dis_count>100)
 		{
 			PAW_DOWN(OFF);
 			same_dis_count=0;		
@@ -744,13 +747,13 @@ void DownPawToLitterPool(float z)
 *Description : 爪子下降程序（下降到5楼平台）(用往下打的激光)
 *Arguments   : float z：激光距四楼平台的高度
 *Returns     : none
-*Notes       : 此时用激光laser.dis1
+*Notes       : 此时用激光laser.dis1    情况3：需要微调
 *****************************************************************************************************************
 */
 void DownPawToPlatform(float z)
 {
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis1_error_count=0;
 	
@@ -806,11 +809,11 @@ void DownPawToPlatform(float z)
 			DOWN_BIT = 1;
 		} 		
 		/*情况3：爪子无法下降，但是绳索仍然下降*/
-		if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+		if (abs(paw_err-paw_err_last)<50)//处理已经下降到底部，但还在下降的情况   此处的距离和累计次数需要微调
 		{
 			same_dis_count = same_dis_count+1;
 			
-			if (same_dis_count>5)
+			if (same_dis_count>100)
 			{
 				PAW_DOWN(OFF);
 				same_dis_count=0;
@@ -929,9 +932,9 @@ void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 		{
 			dis5_err = laser.dis5 - laser.last_dis5;
 			dis6_err = laser.dis6 - laser.last_dis6;
-			dis7_err = laser.dis7 - laser.last_dis7;
+			dis7_err = laser.dis7 - laser.last_dis7; 
 			
-			if ((dis5_err==0)||(dis6_err==0)||(dis7_err==0))//判断大行车数据是否正常
+			if ((dis5_err==0)&&(dis6_err==0)&&(dis7_err==0))//判断大行车数据是否正常
 			{
 				BigCarDataCorrect = 0;
 				RequestStart(BIG_CAR);  //请求大车433发送数据	
@@ -955,13 +958,14 @@ void DataCommunicateManage(uint8_t task_mode,uint8_t OnorOff)
 			dis1_err = laser.dis1 - laser.last_dis1;
 			dis8_err = laser.dis8 - laser.last_dis8;
 			
-			if (dis1_err ==0.0f || dis8_err ==0.0f)//判断大爪子数据是否正常
+			if (dis1_err == 0.0f && dis8_err == 0.0f)//判断大爪子数据是否正常
 			{
 				BigClawDataCorrect = 0;
 				RequestStart(BIG_CLAW);  //请求大爪433发送数据	
 			}	
 			else
 				BigClawDataCorrect = 1;		
+			
 			laser.last_dis1 = laser.dis1;//保存历史值
 			laser.last_dis8 = laser.dis8;
 		}

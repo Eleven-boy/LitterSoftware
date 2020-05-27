@@ -54,6 +54,10 @@ uint8_t Up_Data_Flag = 0;
 POSITION origin;//起始位置
 POSITION target;//目标位置 
 
+uint8_t pin1State,pin2State;
+
+
+
  /*
  *************************************************************************
  *                        函数声明
@@ -74,11 +78,17 @@ int main(void)
 	laser.last_dis7 = laser.dis7;
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
+
+	while((0==BigClawDataCorrect))
+	{
+		DataCommunicateManage(BIG_CLAW,1);//请求大爪数据
+		delay_ms(1000);
+	}
 	
-//	while((0==BigClawDataCorrect)||(0==BigCarDataCorrect))
+//	while((0==BigCarDataCorrect))
 //	{
-//		DataCommunicateManage(BIG_CLAW,1);//请求数据
-//		DataCommunicateManage(BIG_CAR,1);//请求数据
+//		DataCommunicateManage(BIG_CAR,1);//请求大爪数据
+//		delay_ms(1000);
 //	}
 	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
@@ -92,8 +102,52 @@ int main(void)
 
   //SelfCheckStatus();//开机启动自检程序
 
+/******************测试大车X方向移动ok**************************/
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 1;
+//	target.x[0] = 500;
+/******************测试大车Y方向移动ok**************************/
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 2;
+//	target.y[0] = 500;
+/******************测试大爪从焚料池上升ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 4;
+/******************测试大爪从平台上升ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 5;
+/******************测试大爪下降到焚烧池ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 7;
+/******************测试大爪下降到平台ok**************************/	
+	delay_ms(1000);
+	WaitFlag = 2;
+	Run_Mode = 1;
+	HTaskModeFlag = 8;
+/******************测试大爪抓料ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 9;
+/******************测试大爪抓料ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 2;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 10;
 
 
+
+	TIM_Cmd(TIM7,ENABLE); //打开定时器
 	
 	while(1) 
   { 		
@@ -166,8 +220,8 @@ int main(void)
 		
 		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-			adc1 = 5.0f*((ADC_Converted_Buff[0]*3300.0f)/4096.0f)-3000.0f;
-			adc2 = 5.0f*((ADC_Converted_Buff[1]*3300.0f)/4096.0f)-3000.0f;
+//			adc1 = 5.0f*((ADC_Converted_Buff[0]*3300.0f)/4096.0f)-3000.0f;
+//			adc2 = 5.0f*((ADC_Converted_Buff[1]*3300.0f)/4096.0f)-3000.0f;
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//200ms上传一次数据		
@@ -180,25 +234,23 @@ int main(void)
 				ALARM_ON;
 			}
 			task_tim.time_200ms -= 400;
-		}
-	
-		
+		}		
 	}	 
 }
 
 void BSP_Init(void)
 {
-  LED_Init();                     //LED初始化
-	Key_Init();                     //按键初始化
-	ADC_DMA_Init();                 //ADC_DMA初始化
-	Alarm_GPIO_Init();              //报警端口初始化
-	Relay_GPIO_Init();              //继电器端口初始化
-	EXTIX_Init();                  //外部中断初始化(用于紧急停止按钮 )
-	USART1_Init(115200);            //USART1初始化(接收传感器的433)
-	USART2_Init(115200);            //USART2初始化(与电脑端通信的433)
-	RS485_Init(115200);             //RS485初始化
-	UART4_Init(115200);	            //UART4初始化(用于调试用)
-	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms 
+  LED_Init();                     //LED初始化  ok
+	Key_Init();                     //按键初始化 ok  
+	ADC_DMA_Init();                 //ADC_DMA初始化  ok 
+	Alarm_GPIO_Init();              //报警端口初始化 ok
+	Relay_GPIO_Init();              //继电器端口初始化 ok
+	EXTIX_Init();                  //外部中断初始化(用于紧急停止按钮 ) ok
+	USART1_Init(115200);            //USART1初始化(接收传感器的433) ok 
+	USART2_Init(115200);            //USART2初始化(与电脑端通信的433) ok
+	RS485_Init(115200);             //RS485初始化 ok
+	UART4_Init(500000);	            //UART4初始化(用于调试用) ok
+	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms  ok
 }
 
 

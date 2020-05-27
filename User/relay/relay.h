@@ -126,9 +126,9 @@
 					else		\
 					GPIO_SetBits(CAR_STOP_GPIO_PORT,CAR_STOP_PIN)		
 
-extern int8_t RelayOnflag;
+extern int RelayOnflag;
 
-extern int8_t RelayOffflag;
+extern int RelayOffflag;
 					
 void Relay_GPIO_Init(void);
 void RelayOn(void);

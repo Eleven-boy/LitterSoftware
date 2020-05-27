@@ -81,7 +81,7 @@ static void bsp_initUSART(u32 bound)
 	USART_InitStructure.USART_BaudRate = bound;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_2;
-	USART_InitStructure.USART_Parity = USART_Parity_Even;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_Init(USARTx, &USART_InitStructure);
@@ -239,10 +239,11 @@ void USARTx_IRQHandler(void)
 #define BYTE1(dwTemp)       (*((char *)(&dwTemp) + 1))
 #define BYTE2(dwTemp)       (*((char *)(&dwTemp) + 2))
 #define BYTE3(dwTemp)       (*((char *)(&dwTemp) + 3))
+u8 Send_DATA[21]; 
 void UART4_Upper_f_Computer(float data1,float data2,float data3,float data4)
 {
 	u8 i,sum;
-	static u8 Send_DATA[21];       
+//	static u8 Send_DATA[21];       
 	Send_DATA[0] =0xAA;    
 	Send_DATA[1] =0xAA;			
 	Send_DATA[2] =0xF1;    

@@ -196,6 +196,7 @@ void USART2_DMA_TxConfig(uint32_t *BufferSRC, uint32_t BufferSize)
 
 	while (DMA_GetCmdStatus(USART_TX_DMA) != DISABLE)
 	{
+		 
 	}
 	
 	USART_TX_DMA->NDTR = BufferSize;
@@ -228,30 +229,29 @@ void USARTx_IRQHandler(void)
 	   USART_RX_DMAReset();
 		
 		 //数据帧处理
-		 if(14==Uart2_Rec_Len)//BIG_CLAW
+		 if(16==Uart2_Rec_Len)//BIG_CLAW  
 		 {
-				//if(0xBB == u2_receive_buff[0])
-			 if(0xAA == u2_receive_buff[0])
+				if(0xBB == u2_receive_buff[0])
 				{
-					for(uint8_t i=0;i<13;i++)
+					for(uint8_t i=0;i<15;i++)//
 					{
 						sum1 += u2_receive_buff[i];
 					}
-					if(u2_receive_buff[13] == sum1)
+					if(u2_receive_buff[15] == sum1)//
 					{
-						LED1_TOGGLE;
+//						LED1_TOGGLE;
 						mpu.acc_z     = ((short)(u2_receive_buff[2]<<8| u2_receive_buff[1]))/32767.0*16;
 						mpu.gyro_z    = ((short)(u2_receive_buff[4]<<8| u2_receive_buff[3]))/32767.0*2000;
 						mpu.angle_x   = ((short)(u2_receive_buff[6]<<8| u2_receive_buff[5]))/32767.0*180;
 						mpu.angle_y   = ((short)(u2_receive_buff[8]<<8| u2_receive_buff[7]))/32767.0*180;
 						mpu.angle_z   = ((short)(u2_receive_buff[10]<<8| u2_receive_buff[9]))/32767.0*180;  
 						laser.sampleval1 = (u2_receive_buff[12]<<8|u2_receive_buff[11]);
-						//laser.sampleval8 = ((u2_receive_buff[14]<<8| u2_receive_buff[13]));
+						laser.sampleval8 = ((u2_receive_buff[14]<<8| u2_receive_buff[13]));
 						laser.dis1       =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;   //下
-						//laser.dis8       =  5.0f*((laser.sampleval8*3300.0f)/4096.0f)-3000.0f+150;  //上
+						laser.dis8       =  5.0f*((laser.sampleval8*3300.0f)/4096.0f)-3000.0f+150;  //上
 						Up_Data.P_z = (int)laser.dis1;
 						Up_Data.A_x = (int16_t)mpu.angle_x;
-						Up_Data.A_y = (int16_t)mpu.angle_y;
+						Up_Data.A_y = (int16_t)mpu.angle_y; 
 					}
 					sum1=0;					
 				}

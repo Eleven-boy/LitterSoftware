@@ -72,7 +72,7 @@ void control_task(void)
 			RelayOnflag++;
 		}
 		
-		if(RelayOffflag>=0)//管遥控器间隔计时
+		if(RelayOffflag>=0)//关遥控器间隔计时
 		{
 			RelayOffflag++;
 		}

@@ -294,7 +294,7 @@ void USARTx_IRQHandler(void)
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       //当接收到数据完成
 	{
 		 USART_ReceiveData(USARTx);                         //读取数据 注意：这句必须要，否则不能够清除中断标志位。
-				 len1 = U1_BUFFSIZERECE;
+		 len1 = U1_BUFFSIZERECE;
 		 len2 = DMA_GetCurrDataCounter(USART_RX_DMA);
 		 uint8_t Uart1_Rec_Len = U1_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			//算出接本帧数据长度
 	   USART_RX_DMAReset();

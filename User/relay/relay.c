@@ -1,8 +1,8 @@
 #include "relay.h"
 
-int8_t RelayOnflag = -1;
+int RelayOnflag = -1;
 
-int8_t RelayOffflag = -1;
+int RelayOffflag = -1;
 
 void Relay_GPIO_Init(void)
 {		
@@ -49,29 +49,34 @@ void Relay_GPIO_Init(void)
 //打开遥控器
 void RelayOn(void)
 {
-	if(RelayOnflag>=0 && RelayOnflag <=10)
+	if(RelayOnflag>=0 && RelayOnflag <=25)
 	{
 		CAR_START(ON);
 	}
+	else if(RelayOnflag>=25 && RelayOnflag <=50)
+	{		
+		CAR_START(OFF); 
+	}	
 	else
 	{
 		RelayOnflag = -2;
-		CAR_START(OFF); 
-	}	
-	 
+	}
 }
 //关闭遥控器
 void RelayOff(void)
 {
-	if(RelayOffflag>=0 && RelayOffflag <=10)
+	if(RelayOffflag>=0 && RelayOffflag <=25)
 	{
 		CAR_STOP(ON);
 	}
+	else if(RelayOffflag>=25 && RelayOffflag <=50)
+	{		
+		CAR_STOP(OFF);
+	}	 
 	else
 	{
 		RelayOffflag = -2;
-		CAR_STOP(OFF);
-	}	  
+	}
 }
 //上电
 void PowerOn(void)

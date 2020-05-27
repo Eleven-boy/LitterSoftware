@@ -5,8 +5,8 @@
 //																					 {0x00,0x04,0x0F},//BIG_CLAW
 //																					 {0x00,0x05,0x0F} //BURN_POOL
 //																				   };
-unsigned char send_request_to_xxx[3][6] = {{0x00,0x02,0x0A},//BIG_CAR
-																					 {0x00,0x02,0x0A},//BIG_CLAW
+unsigned char send_request_to_xxx[3][6] = {{0x00,0x03,0x0F},//BIG_CAR
+																					 {0x00,0x03,0x0F},//BIG_CLAW
 																					 {0x00,0x05,0x0F} //BURN_POOL
 																				   };
 Laser laser;

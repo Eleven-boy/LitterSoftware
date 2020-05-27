@@ -31,7 +31,7 @@ void ManualXMoving(float x)
 //------------------------------------------------------------
 	PowerOn();//行车上电
 //------------------------------------------------------------	
-	if(1==BigCarDataCorrect)//数据正常
+	if((1==BigCarDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{		
 		if(0==X_MOVE_BIT)
 		{
@@ -83,7 +83,7 @@ void ManualYMoving(float y)
 //------------------------------------------------------------
 	PowerOn();//行车上电
 //------------------------------------------------------------	
-	if(1==BigCarDataCorrect)//数据正常
+	if((1==BigCarDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{		
 		if(0==Y_MOVE_BIT)
 		{
@@ -134,7 +134,7 @@ void ManualClose(void)
 	//------------------------------------------------------------
 	PowerOn();//行车上电
   //------------------------------------------------------------	
-	if(CloseFlag==0)
+	if((CloseFlag==0)&&(RelayOnflag == -2))
 	{
 		CloseFlag=1;
 	}
@@ -172,13 +172,13 @@ void ManualOpen(void)
 	//------------------------------------------------------------
 	PowerOn();//行车上电
   //------------------------------------------------------------
-	if(OpenFlag==0)
+	if((OpenFlag == 0)&&(RelayOnflag == -2))
 	{
 		OpenFlag=1;
 	}
 	else if(OpenFlag==1)
 	{
-		ClosePaw();
+		ReleasePaw();
 	}
 	else if(OpenFlag==2)
 	{
@@ -188,9 +188,9 @@ void ManualOpen(void)
 		{	
 			RelayOnflag = -1;//复位
 			RelayOffflag = -1;//复位
-			HTaskModeFlag=0;//无任务模式
+			HTaskModeFlag = 0;//无任务模式
 			WaitFlag = 0;//进入等待状态
-			OpenFlag = 0;//复位
+			OpenFlag = 0;//复位 
 		}		
 	}	
 }
@@ -210,7 +210,7 @@ void ManualRaisePawFromLitterPool(float z)
 	PowerOn();//行车上电
   //------------------------------------------------------------
 	
-	if(1==BigClawDataCorrect)//数据正常
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(UP_BIT == 0)//正在运行
 		{
@@ -258,7 +258,10 @@ void ManualRaisePawFromLitterPool(float z)
 */
 void ManualRisePawFromPlatform(float z)
 {
-	if(1==BigClawDataCorrect)//数据正常
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(UP_BIT == 0)
 		{
@@ -306,14 +309,17 @@ void ManualRisePawFromPlatform(float z)
 */
 void ManualRisePawFromBurnPool(float z)
 {
-	if(1==BigClawDataCorrect)//数据正常
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(UP_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
 		  UpPawFromBurnPool(z);		
 		}
-		else if(DOWN_BIT == 1)//正常运行结束
+		else if(UP_BIT == 1)//正常运行结束
 		{
 			/*上升结束*/
 			PowerOff();
@@ -327,7 +333,7 @@ void ManualRisePawFromBurnPool(float z)
 				UP_BIT = 0;//复位
 			}
 		}
-		else if(DOWN_BIT == 2)//运行过程中出错
+		else if(UP_BIT == 2)//运行过程中出错
 		{
 			PowerOff();
 			ManualError = 1;//表示出错
@@ -355,7 +361,7 @@ void ManualRisePawFromBurnPool(float z)
 */
 void ManualDowntoLitterPool(float z)
 {
-	if(1==BigClawDataCorrect)//数据正常
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{
@@ -404,12 +410,15 @@ void ManualDowntoLitterPool(float z)
 */
 void ManualDownClawtoBurnPool(float z)
 {
-	if(1==BigClawDataCorrect)//数据正常
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  DownPawToLitterPool(z);		
+		  DownPawToBurnPool(z);		
 		}
 		else if(DOWN_BIT == 1)//正常运行结束
 		{
@@ -453,7 +462,10 @@ void ManualDownClawtoBurnPool(float z)
 */
 void ManualDownToOrigin(float z)
 {
-	if(1==BigClawDataCorrect)//数据正常
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------
+	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(DOWN_BIT == 0)
 		{

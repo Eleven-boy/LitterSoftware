@@ -29,11 +29,11 @@
 #define BIG_CAR_X_OFFSET  2000
 #define BURN_POOL_X  4600            //大行车停留在料坑上方时x坐标
 #define BURN_POOL_Y  4400            //大行车停留在料坑上方时y坐标
-#define BURN_POOL_DZ  5000            //大行车在焚料池上方下放时上面激光剧顶部距离
+#define BURN_POOL_DZ  5000            //大行车在焚料池上方下放时上面激光剧顶部距离   
 #define BURN_POOL_UZ  3000            //大行车在焚料池上方上升时上面激光剧顶部距离
-#define PLATFORM_UZ  3000            //大行车在五楼平台上方上升时上面激光剧顶部距离
+#define PLATFORM_UZ   3000            //大行车在五楼平台上方上升时下面激光距底部距离   
 
-#define abs(x)  ((x<0)?(-x):x)       //求x的绝对值
+#define abs(x)  ((x<0)?(-(x)):x)       //求x的绝对值
 
 extern uint8_t X_MOVE_BIT;
 extern uint8_t Y_MOVE_BIT;
