@@ -104,61 +104,73 @@ int main(void)
 
 /******************测试大车X方向移动ok**************************/
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 1;
 //	target.x[0] = 500;
 /******************测试大车Y方向移动ok**************************/
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 2;
 //	target.y[0] = 500;
+/******************测试大爪下降到垃圾池ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 1;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 3;
 /******************测试大爪从焚料池上升ok**************************/	
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 4;
 /******************测试大爪从平台上升ok**************************/	
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 5;
+/******************测试大爪下降到垃圾池ok**************************/	
+//	delay_ms(1000);
+//	WaitFlag = 1;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 6;
 /******************测试大爪下降到焚烧池ok**************************/	
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 7;
 /******************测试大爪下降到平台ok**************************/	
-	delay_ms(1000);
-	WaitFlag = 2;
-	Run_Mode = 1;
-	HTaskModeFlag = 8;
+//	delay_ms(1000);
+//	WaitFlag = 1;
+//	Run_Mode = 1;
+//	HTaskModeFlag = 8;
 /******************测试大爪抓料ok**************************/	
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 9;
 /******************测试大爪抓料ok**************************/	
 //	delay_ms(1000);
-//	WaitFlag = 2;
+//	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 10;
-
-
 
 	TIM_Cmd(TIM7,ENABLE); //打开定时器
 	
 	while(1) 
   { 		
 		if(task_tim.time_10ms >= 20)//运行任务每次10ms
-		{
-			
+		{			
 			if(1 == WaitFlag)//已收到上位机传来数据
 			{				
 				//ChoseTask(Choice);
 				/*给Run_Mode赋值，指示何种运行模式*/
 				//HTaskModeFlag = 0;
+				if ((Run_Mode == 1)&&(HTaskModeFlag == 3))
+					UpOrDown = 1;
+				else if ((Run_Mode == 1)&&(HTaskModeFlag == 6))
+					UpOrDown = 0; 
+							
 				WaitFlag = 2;//已收到指令正在运行
 			}
 			else if(0 == WaitFlag)/*等待上位机发送命令*/
@@ -220,6 +232,7 @@ int main(void)
 		
 		if(task_tim.time_200ms >= 400)//200ms发送
 		{
+			UART4_Upper_f_Computer(mpu.acc_z,0,0,0);
 //			adc1 = 5.0f*((ADC_Converted_Buff[0]*3300.0f)/4096.0f)-3000.0f;
 //			adc2 = 5.0f*((ADC_Converted_Buff[1]*3300.0f)/4096.0f)-3000.0f;
 			if(1==Up_Data_Flag)
@@ -249,7 +262,7 @@ void BSP_Init(void)
 	USART1_Init(115200);            //USART1初始化(接收传感器的433) ok 
 	USART2_Init(115200);            //USART2初始化(与电脑端通信的433) ok
 	RS485_Init(115200);             //RS485初始化 ok
-	UART4_Init(500000);	            //UART4初始化(用于调试用) ok
+	UART4_Init(115200);	            //UART4初始化(用于调试用) ok
 	TIM7_Init(500-1,84-1);          //f=2kHZ,T=0.5ms  ok
 }
 

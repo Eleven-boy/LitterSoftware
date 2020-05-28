@@ -361,6 +361,9 @@ void ManualRisePawFromBurnPool(float z)
 */
 void ManualDowntoLitterPool(float z)
 {
+	//------------------------------------------------------------
+	PowerOn();//行车上电
+  //------------------------------------------------------------	
 	if((1==BigClawDataCorrect)&&(RelayOnflag == -2))//数据正常
 	{
 		if(DOWN_BIT == 0)

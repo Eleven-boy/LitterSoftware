@@ -472,7 +472,7 @@ void UpPawFromLitterPool(float z)
 		在下半部分时，用往下打的激光传感器
 	*/
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis1_error_count=0;
 	static uint8_t dis8_error_count=0;
@@ -483,13 +483,13 @@ void UpPawFromLitterPool(float z)
 		
 		if((laser.dis1>0 && laser.dis1<10000) && laser.dis8<0)
 		{
-			PAW_DOWN(ON);	
+			PAW_UP(ON);	
 		}
 		
 		if (laser.dis1<0 && laser.dis8>0)//满足条件转到下一控制逻辑
 		{
 			same_dis_count = same_dis_count+1;			
-			if (same_dis_count>5)
+			if (same_dis_count>100)
 			{
 				UpOrDown = 0;
 				same_dis_count=0;
@@ -524,11 +524,11 @@ void UpPawFromLitterPool(float z)
 			UP_BIT = 1;//上升完成标志位置1
 		}	
 		/*情况2：爪子无法上升，但是abs(paw_err)>300*/
-		if (abs(paw_err-paw_err_last)<100)//处理已经上升到限位的情况
+		if (abs(paw_err-paw_err_last)<50)//处理已经上升到限位的情况
 		{
 			same_dis_count = same_dis_count+1;
 			
-			if (same_dis_count>5)
+			if (same_dis_count>100)
 			{
 				PAW_UP(OFF);
 				same_dis_count=0;				
@@ -637,7 +637,7 @@ void DownPawToLitterPool(float z)
 		在下半部分时，用往下打的激光传感器
 	*/
 	float paw_err=0; 
-	float paw_err_last=0;
+	static float paw_err_last=0;
 	static uint8_t same_dis_count=0;
 	static uint8_t dis1_error_count=0;
 	
@@ -652,7 +652,7 @@ void DownPawToLitterPool(float z)
 		if (laser.dis8<0 && laser.dis1>0)
 		{
 			same_dis_count = same_dis_count+1;			
-			if (same_dis_count>5)
+			if (same_dis_count>100)
 			{
 				UpOrDown = 1;
 				same_dis_count=0;
@@ -668,7 +668,7 @@ void DownPawToLitterPool(float z)
 	{
 		if (laser.dis1<0)//滤除偶尔出现的错误值
 		{
-			if(dis1_error_count<10)
+			if(dis1_error_count<100)
 			{
 				dis1_error_count++;
 				laser.dis1=laser.last_dis1;
@@ -717,11 +717,11 @@ void DownPawToLitterPool(float z)
 				DOWN_BIT = 1;
 			} 		
 			/*情况3：爪子无法下降，但是绳索仍然下降*/
-			if (abs(paw_err-paw_err_last)<100)//处理已经下降到底部，但还在下降的情况
+			if (abs(paw_err-paw_err_last)<50)//处理已经下降到底部，但还在下降的情况
 			{
 				same_dis_count = same_dis_count+1;
 				
-				if (same_dis_count>5)
+				if (same_dis_count>100)
 				{
 					PAW_DOWN(OFF);
 					same_dis_count=0;
