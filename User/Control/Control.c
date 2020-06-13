@@ -57,14 +57,16 @@ void control_task(void)
 			PointMoveTime++;
 		}
 		
-		if(CloseFlag == 1)//合爪计时
+		if(CloseFlag >= 0)//合爪计时
 		{
-			CloseDelay++;
+//			CloseDelay++;
+			CloseFlag++;
 		}
 		
-		if(OpenFlag == 1)//松爪计时
+		if(OpenFlag >= 0)//松爪计时
 		{
-			OpenDelay++;
+//			OpenDelay++;
+			OpenFlag++;
 		}		
 		
 		if(RelayOnflag>=0)//开遥控器间隔计时

@@ -40,3 +40,4 @@
 ..\..\output\lcfunc.o: ..\..\User\systick\bsp_SysTick.h
 ..\..\output\lcfunc.o: ..\..\User\USART2\usart2.h
 ..\..\output\lcfunc.o: ..\..\User\relay\relay.h
+..\..\output\lcfunc.o: ..\..\User\led\bsp_led.h

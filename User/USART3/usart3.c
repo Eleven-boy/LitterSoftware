@@ -2,6 +2,8 @@
 #include "Data_type.h"
 #include "Manual.h"
 #include "RS485.h"
+#include "LCFunc.h"
+#include "relay.h"
 #include "CRC.h"
 #include "bsp_led.h" 
 
@@ -270,6 +272,7 @@ void USARTx_IRQHandler(void)
 {	
 	u8 i=0;
   u16 CRC_NUM;
+	static int temp=0;;
 	u8 valid_data[100];
 	
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       //当接收到数据完成
@@ -281,16 +284,16 @@ void USARTx_IRQHandler(void)
 		 //数据帧处理
 		 if(0xAB == u3_receive_buff[0])//地址码
 		 {			 
-			 Up_Data_Flag = 1;
+			 //Up_Data_Flag = 1;
 			 
 			 //CRC校验
-			 for(int j = 1;j<u3_receive_buff[1]-2;j++)
+			 for(int j = 3;j<u3_receive_buff[1]-2;j++)
 					valid_data[i++] = u3_receive_buff[j];
-			 CRC_NUM = (u3_receive_buff[u3_receive_buff[1]-2] << 8 | u3_receive_buff[u3_receive_buff[1]-1]);
+			 CRC_NUM = (u3_receive_buff[u3_receive_buff[1]-1] << 8 | u3_receive_buff[u3_receive_buff[1]-2]);
 			 
 			 if(CRC_NUM == CRC16(valid_data,i))//CRC校验通过
-			 {
-				  
+			 {	
+				 #if Manual == 1
 					if(0==(u3_receive_buff[2]&0x07))//监听,长时间运行状态
 					{
 						//WaitFlag = 0;
@@ -299,17 +302,20 @@ void USARTx_IRQHandler(void)
 					}
 					else if(1==(u3_receive_buff[2]&0x07))//手动
 					{
-						WaitFlag = 1;
-						Run_Mode = 1;
 						HTaskModeFlag = u3_receive_buff[2]>>3;
+						
+						if(HTaskModeFlag != 0){
+							WaitFlag = 1;
+							Run_Mode = 1;						
+						}
 						
 						Up_Data.Status &= 0xF8;
 						Up_Data.Status |= 0x01;//返回该值，说明已成功接收到									
 					}
 					else if(2==(u3_receive_buff[2]&0x07))//半自动
 					{
-						target.x[0] = ((int)u3_receive_buff[12]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[14]);
-						target.y[0] = ((int)u3_receive_buff[14]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[17]); 
+						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
 
 						if((u3_receive_buff[21]>>4)==0x01)
 							IsExecute = 1;//确认执行下一步
@@ -322,8 +328,8 @@ void USARTx_IRQHandler(void)
 					}
 					else if(3==(u3_receive_buff[2]&0x07))//全自动
 					{
-						target.x[0] = ((int)u3_receive_buff[12]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[14]);
-						target.y[0] = ((int)u3_receive_buff[14]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[17]); 
+						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
 
 						WaitFlag = 1;
 						Run_Mode = 3;		
@@ -347,13 +353,172 @@ void USARTx_IRQHandler(void)
 						
 					}			 
 			 }
-				
-			Up_Data_Flag = 1;
-				
-		 }
-		
-		 //直接在中断中接收处理数据 
+				#elif Manual == 2
+					if(0==(u3_receive_buff[2]&0x07))//监听,长时间运行状态
+					{
+						//WaitFlag = 0;
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x00;//返回该值，说明已成功接收到	
+					}
+					else if(1==(u3_receive_buff[2]&0x07))//手动
+					{
 
+						HTaskModeFlag = u3_receive_buff[2]>>3;
+						
+						if(HTaskModeFlag != 0){
+							WaitFlag = 1;
+							Run_Mode = 1;
+						}
+						
+						if(1 == (u3_receive_buff[21]&0x07)){//打开遥控器
+							WaitFlag = 1;
+							Run_Mode = 1;
+							HTaskModeFlag = 9;
+						}
+						else if(2 == (u3_receive_buff[21]&0x07)){//关闭遥控器
+							WaitFlag = 1;
+							Run_Mode = 1;
+							HTaskModeFlag = 10;
+						}
+						
+						
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x01;//返回该值，说明已成功接收到，已经处于手动状态									
+					}		
+				#elif Manual == 3
+					if(1==(u3_receive_buff[2]&0x07))//监听,长时间运行状态
+					{
+						//WaitFlag = 0;
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x01;//返回该值，说明已成功接收到	
+						Up_Data_Flag = 1;	
+					}
+					else if(2==(u3_receive_buff[2]&0x07))//手动
+					{						
+						if(RelayOnflag == -2){
+							HTaskModeFlag = u3_receive_buff[2]>>3;
+							if(HTaskModeFlag == 1 || HTaskModeFlag == 2){//X,Y方向移动
+								WaitFlag = 1;
+								Run_Mode = 1;
+								target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+								target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+							}		
+							else if(HTaskModeFlag >= 3 && HTaskModeFlag <= 8){//上升下降的几种模式
+								if((Up_Data.Status&0x78) != 0x48){
+									target.uwbdis[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+									WaitFlag = 1;
+									Run_Mode = 1;									
+								}
+
+								/*
+								if(laser.dis6 > 10000.0f){//在垃圾池区域
+									if(target.uwbdis[0] < mpu.dis){//从料坑上升
+										HTaskModeFlag = 3;
+										WaitFlag = 1;
+										Run_Mode = 1;
+									}
+									else if(target.uwbdis[0] > mpu.dis){//从料坑下降
+										HTaskModeFlag = 6;
+										WaitFlag = 1;
+										Run_Mode = 1;
+									}
+								}
+								else if(laser.dis6 > 7000.0f && laser.dis6 < 9000.0f){//在4楼平台区域，用往下射的激光
+									if(target.uwbdis[0] < mpu.dis){//从平台上升
+										//target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+										HTaskModeFlag = 5;
+										WaitFlag = 1;
+										Run_Mode = 1;
+									}
+									else if(target.uwbdis[0] > mpu.dis){//下降到平台
+//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+										HTaskModeFlag = 8;
+										WaitFlag = 1;
+										Run_Mode = 1;										
+									}
+								}
+								else if(laser.dis6 > 4000.0f && laser.dis6 < 6000.0f){//在焚料池上方区域
+									if(target.uwbdis[0] < mpu.dis){//从焚料池上升
+//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+										HTaskModeFlag = 4;
+										WaitFlag = 1;
+										Run_Mode = 1;	
+									}
+									else if(target.uwbdis[0] > mpu.dis){//下降到焚料池
+//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+										HTaskModeFlag = 7;
+										WaitFlag = 1;
+										Run_Mode = 1;	
+									}
+								}
+								*/
+							}
+							else if(HTaskModeFlag == 9){//抓料
+								WaitFlag = 1;
+								Run_Mode = 1;	
+							}
+							else if(HTaskModeFlag == 10){//放料
+								WaitFlag = 1;
+								Run_Mode = 1;	
+							}
+							else if(HTaskModeFlag == 0){
+//								temp=0;//清零
+								Up_Data.Status &= 0x87;//此时的状态值  无任务
+							}
+						}
+
+						if(1 == (u3_receive_buff[21]&0x07)){//打开遥控器
+							WaitFlag = 1;
+							Run_Mode = 1;
+							HTaskModeFlag = 11;
+						}
+						else if(2 == (u3_receive_buff[21]&0x07))
+							{//关闭遥控器
+							WaitFlag = 1;
+							Run_Mode = 1;
+							HTaskModeFlag = 12;
+						}	
+//						else if(0 == (u3_receive_buff[21]&0x07))
+//						{
+//							Up_Data.Status &= 0x87;
+//						}								
+
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x02;//返回该值，说明已成功接收到	
+
+						Up_Data_Flag = 1;
+					}
+					else if(3==(u3_receive_buff[2]&0x07))//半自动
+					{
+						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+
+						if((u3_receive_buff[21]>>4)==0x01)
+							IsExecute = 1;//确认执行下一步
+						
+						WaitFlag = 1;
+						Run_Mode = 2;	
+						
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到			
+					}
+					else if(4==(u3_receive_buff[2]&0x07))//全自动
+					{
+						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+
+						WaitFlag = 1;
+						Run_Mode = 3;		
+						Up_Data.Status &= 0xF8;
+						Up_Data.Status |= 0x04;//返回该值，说明已成功接收到
+					}		 
+			 }				
+				
+				#endif
+					
+		 }
+	 	
+		 //直接在中断中接收处理数据 
 	}else if(USART_GetITStatus(USARTx, USART_IT_TC) == SET)
 	{
 		USART_ClearITPendingBit(USARTx, USART_IT_TC);         //清除中断标志
@@ -366,6 +531,7 @@ void USARTx_IRQHandler(void)
 		RS485_RE = 0;
 	}
 }
+
 
 
 

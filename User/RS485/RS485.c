@@ -71,8 +71,14 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 	u8 _cnt = 0,c_cnt = 0;
 	u8 i = 0;
 	u16 CRC_NUM = 0;
-	static u8 send_data[100]={0};
+	static u8  send_data[100]={0};
 	u8 valid_data[100]={0};
+	
+//	Up_Data.P_x =1234;
+//	Up_Data.P_y =-2;
+//	Up_Data.P_z = 20000;
+//	Up_Data.A_x = 10;
+//	Up_Data.A_y = 12;
 	
 	Up_Data.Add = 0xAA;
 	
@@ -80,23 +86,23 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 	
 	_cnt++;                                 //空一个，用来存放发送的总字节数
 	
-	send_data[_cnt++]  = BYTE3(Up_Data.P_x);//x坐标
-	send_data[_cnt++]  = BYTE2(Up_Data.P_x);
+	send_data[_cnt++]  = BYTE0(Up_Data.P_x);//x坐标
 	send_data[_cnt++]  = BYTE1(Up_Data.P_x);
+	send_data[_cnt++]  = BYTE2(Up_Data.P_x);
 
-	send_data[_cnt++]  = BYTE3(Up_Data.P_y);//y坐标
-	send_data[_cnt++]  = BYTE2(Up_Data.P_y);
+	send_data[_cnt++]  = BYTE0(Up_Data.P_y);//y坐标
 	send_data[_cnt++]  = BYTE1(Up_Data.P_y);
+	send_data[_cnt++]  = BYTE2(Up_Data.P_y);
 	
-	send_data[_cnt++]  = BYTE3(Up_Data.P_z);//z坐标
-	send_data[_cnt++]  = BYTE2(Up_Data.P_z);
+	send_data[_cnt++]  = BYTE0(Up_Data.P_z);//z坐标
 	send_data[_cnt++]  = BYTE1(Up_Data.P_z);
+	send_data[_cnt++]  = BYTE2(Up_Data.P_z);
 
-	send_data[_cnt++]  = BYTE3(Up_Data.A_x);//6050x轴角度
-	send_data[_cnt++]  = BYTE2(Up_Data.A_x);
+	send_data[_cnt++]  = BYTE0(Up_Data.A_x);//6050x轴角度
+	send_data[_cnt++]  = BYTE1(Up_Data.A_x);
 	
-	send_data[_cnt++]  = BYTE3(Up_Data.A_y);//6050y轴角度
-	send_data[_cnt++]  = BYTE2(Up_Data.A_y);
+	send_data[_cnt++]  = BYTE0(Up_Data.A_y);//6050y轴角度
+	send_data[_cnt++]  = BYTE1(Up_Data.A_y);
 	
 	send_data[_cnt++]  = Up_Data.HalfStep;  //非0有效，需要请求的下步动作
 	
@@ -106,12 +112,12 @@ void RS485_Send_Data(void)//UASRT DMA发送设置
 	for(c_cnt=2;c_cnt < _cnt;c_cnt++) valid_data[i++] = send_data[c_cnt];
 	CRC_NUM = CRC16(valid_data,i);
 
-	send_data[_cnt++] = BYTE1(CRC_NUM);
-	send_data[_cnt++]	= BYTE0(CRC_NUM);
+	send_data[_cnt++] = BYTE0(CRC_NUM);
+	send_data[_cnt++]	= BYTE1(CRC_NUM);
 	
 	send_data[_cnt++] = 0xEE;//结束符
 	
-	send_data[2] = _cnt;//发送数据的总字节数
+	send_data[1] = _cnt;//发送数据的总字节数
 	
 	RS485_DE = 1;
 	RS485_RE = 1;

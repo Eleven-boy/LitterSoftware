@@ -8,6 +8,7 @@
  *******************************************************/
 //限幅
 #define LIMIT( x,min,max ) ( (x) < (min)  ? (min) : ( (x) > (max) ? (max) : (x) ) )
+
 /*******************************************************
  *                     结构体定义
  *******************************************************/
@@ -44,6 +45,7 @@ extern Laser laser;
 
 //mpu6050
 typedef struct{
+	int dis;
 	float acc_z;
 	float gyro_z;
 	float angle_x;
@@ -58,6 +60,7 @@ typedef struct{
     int x[2];
     int y[2];
     int z[2];
+	  int uwbdis[2];
 }POSITION; 
 extern POSITION origin;//起始位置
 extern POSITION target;//目标位置 

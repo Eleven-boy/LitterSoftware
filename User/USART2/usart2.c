@@ -217,14 +217,12 @@ static void USART_RX_DMAReset(void)
  	DMA_Cmd(USART_RX_DMA, ENABLE); 
 }	
 u8 sum1;
-
+#define abs(x)  ((x<0)?(-(x)):x)       //求x的绝对值
 void USARTx_IRQHandler(void)
 {	
 	if (USART_GetITStatus(USARTx, USART_IT_IDLE) == SET)       
 	{
 		 USART_ReceiveData(USARTx);       
-//		 len1 = U2_BUFFSIZERECE;
-//		 len2 = DMA_GetCurrDataCounter(USART_RX_DMA);
 		 uint8_t Uart2_Rec_Len = U2_BUFFSIZERECE - DMA_GetCurrDataCounter(USART_RX_DMA);			
 	   USART_RX_DMAReset();
 		
@@ -239,19 +237,27 @@ void USARTx_IRQHandler(void)
 					}
 					if(u2_receive_buff[15] == sum1)//
 					{
-//						LED1_TOGGLE;
+						LED1_TOGGLE;
+						/*//mpu6050
 						mpu.acc_z     = ((short)(u2_receive_buff[2]<<8| u2_receive_buff[1]))/32767.0*16;
 						mpu.gyro_z    = ((short)(u2_receive_buff[4]<<8| u2_receive_buff[3]))/32767.0*2000;
 						mpu.angle_x   = ((short)(u2_receive_buff[6]<<8| u2_receive_buff[5]))/32767.0*180;
 						mpu.angle_y   = ((short)(u2_receive_buff[8]<<8| u2_receive_buff[7]))/32767.0*180;
 						mpu.angle_z   = ((short)(u2_receive_buff[10]<<8| u2_receive_buff[9]))/32767.0*180;  
+						*/
+						//uwb_data
+						mpu.dis = ((int)(u2_receive_buff[3]<<24 | u2_receive_buff[2]<<16 | u2_receive_buff[1]<<8))/256;
+						mpu.angle_x = ((short)(u2_receive_buff[5]<<8 | u2_receive_buff[4] ))/100.0;
+						mpu.angle_y = ((short)(u2_receive_buff[7]<<8 | u2_receive_buff[6] ))/100.0;
+						mpu.angle_z = ((short)(u2_receive_buff[9]<<8 | u2_receive_buff[8] ))/100.0;
+						
 						laser.sampleval1 = (u2_receive_buff[12]<<8|u2_receive_buff[11]);
-						laser.sampleval8 = ((u2_receive_buff[14]<<8| u2_receive_buff[13]));
+//						laser.sampleval8 = ((u2_receive_buff[14]<<8| u2_receive_buff[13]));
 						laser.dis1       =  5.0f*((laser.sampleval1*3300.0f)/4096.0f)-3000.0f;   //下
-						laser.dis8       =  5.0f*((laser.sampleval8*3300.0f)/4096.0f)-3000.0f+150;  //上
-						Up_Data.P_z = (int)laser.dis1;
-						Up_Data.A_x = (int16_t)mpu.angle_x;
-						Up_Data.A_y = (int16_t)mpu.angle_y; 
+//						laser.dis8       =  5.0f*((laser.sampleval8*3300.0f)/4096.0f)-3000.0f+150;  //上
+						Up_Data.P_z = mpu.dis;
+						Up_Data.A_x = abs((int16_t)mpu.angle_x);
+						Up_Data.A_y = abs((int16_t)mpu.angle_x); 
 					}
 					sum1=0;					
 				}

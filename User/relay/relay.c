@@ -49,11 +49,11 @@ void Relay_GPIO_Init(void)
 //´ò¿ªÒ£¿ØÆ÷
 void RelayOn(void)
 {
-	if(RelayOnflag>=0 && RelayOnflag <=25)
+	if(RelayOnflag>=0 && RelayOnflag <=15)
 	{
 		CAR_START(ON);
 	}
-	else if(RelayOnflag>=25 && RelayOnflag <=50)
+	else if(RelayOnflag>=15 && RelayOnflag <=30)
 	{		
 		CAR_START(OFF); 
 	}	
@@ -65,11 +65,11 @@ void RelayOn(void)
 //¹Ø±ÕÒ£¿ØÆ÷
 void RelayOff(void)
 {
-	if(RelayOffflag>=0 && RelayOffflag <=25)
+	if(RelayOffflag>=0 && RelayOffflag <=15)
 	{
 		CAR_STOP(ON);
 	}
-	else if(RelayOffflag>=25 && RelayOffflag <=50)
+	else if(RelayOffflag>=15 && RelayOffflag <=30)
 	{		
 		CAR_STOP(OFF);
 	}	 

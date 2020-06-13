@@ -79,26 +79,19 @@ int main(void)
 	laser.last_dis1 = laser.dis1;//保存历史值
 	laser.last_dis8 = laser.dis8;	
 
-	while((0==BigClawDataCorrect))
-	{
-		DataCommunicateManage(BIG_CLAW,1);//请求大爪数据
-		delay_ms(1000);
-	}
-	
-//	while((0==BigCarDataCorrect))
+//	while((0==BigClawDataCorrect))
 //	{
-//		DataCommunicateManage(BIG_CAR,1);//请求大爪数据
+//		DataCommunicateManage(BIG_CLAW,1);//请求大爪数据
 //		delay_ms(1000);
 //	}
-	Up_Data.Status = Up_Data.Status|0x80;	//初始状态设为正常状态，最高位置1
 	
-	//初始值
-	//	target.x[0] = 13000;
-	//	target.y[0] = 4000; 
-	//	target.z[0] = 1600; 
-	//	origin.x[0] = 7900; 
-	//	origin.y[0] = 4000; 
-	//	origin.z[0] = 1700;  
+	while((0==BigCarDataCorrect))
+	{
+		DataCommunicateManage(BIG_CAR,1);//请求大爪数据
+		delay_ms(1000);
+	}
+	Up_Data.Status = Up_Data.Status|0xF0;	//初始状态设为正常状态，最高位置1
+
 
   //SelfCheckStatus();//开机启动自检程序
 
@@ -119,11 +112,13 @@ int main(void)
 //	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 3;
-/******************测试大爪从焚料池上升ok**************************/	
+///******************测试大爪从焚料池上升ok**************************/	
 //	delay_ms(1000);
 //	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 4;
+//	target.uwbdis[0] = 500;
+//	RelayOnflag = -2;
 /******************测试大爪从平台上升ok**************************/	
 //	delay_ms(1000);
 //	WaitFlag = 1;
@@ -139,11 +134,15 @@ int main(void)
 //	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 7;
+//	target.uwbdis[0] = 2500;
+//	RelayOnflag = -2;
 /******************测试大爪下降到平台ok**************************/	
 //	delay_ms(1000);
 //	WaitFlag = 1;
 //	Run_Mode = 1;
 //	HTaskModeFlag = 8;
+//	target.uwbdis[0] = 3000;
+//	RelayOnflag = -2;
 /******************测试大爪抓料ok**************************/	
 //	delay_ms(1000);
 //	WaitFlag = 1;
@@ -155,6 +154,7 @@ int main(void)
 //	Run_Mode = 1;
 //	HTaskModeFlag = 10;
 
+	//laser.dis6 = 5000;
 	TIM_Cmd(TIM7,ENABLE); //打开定时器
 	
 	while(1) 
@@ -166,11 +166,10 @@ int main(void)
 				//ChoseTask(Choice);
 				/*给Run_Mode赋值，指示何种运行模式*/
 				//HTaskModeFlag = 0;
-				if ((Run_Mode == 1)&&(HTaskModeFlag == 3))
-					UpOrDown = 1;
-				else if ((Run_Mode == 1)&&(HTaskModeFlag == 6))
-					UpOrDown = 0; 
-							
+//				if ((Run_Mode == 1)&&(HTaskModeFlag == 3))
+//					UpOrDown = 1;
+//				else if ((Run_Mode == 1)&&(HTaskModeFlag == 6))
+//					UpOrDown = 0; 
 				WaitFlag = 2;//已收到指令正在运行
 			}
 			else if(0 == WaitFlag)/*等待上位机发送命令*/
@@ -184,6 +183,7 @@ int main(void)
 					//根据指令选择要执行的任务
 					switch(HTaskModeFlag)
 					{
+						#if Manual == 1
 						case 1: //X
 							ManualXMoving(target.x[0]);
 							break;
@@ -213,9 +213,100 @@ int main(void)
 							break;	
 						case 10: //放料
 							ManualOpen();
-							break;							
+							break;									
 						default:
 							break;
+						#elif Manual == 2
+						case 0:
+							WaitFlag = 0;
+							Run_Mode = 0;
+							CAR_NORTH(OFF);
+							CAR_SOUTH(OFF);
+							CAR_WEST(OFF);
+							CAR_EAST(OFF);
+							PAW_UP(OFF);
+							PAW_DOWN(OFF);
+							PAW_CLOSE(OFF);
+							PAW_RELEASE(OFF);
+							break;
+						case 1: //X+
+							ManualMoveToNorth();
+							break;
+						case 2: //X-
+							ManualMoveToSouth();
+							break;
+						case 3: //Y+
+							ManualMoveToWest();
+							break;				
+						case 4: //Y-
+							ManualMoveToEast();
+							break;
+						case 5: //上
+							ManualRaisePaw();
+							break;	
+						case 6: //下
+							ManualDownPaw();
+							break;		
+						case 7: //抓料
+							ManualClosePaw();
+							break;
+						case 8: //放料
+							ManualOpenPaw();
+							break;		
+						case 9: //打开遥控器
+							ManualPowerOn();
+							break;	
+						case 10://关闭遥控器
+							ManualPowerOff();
+							break;							
+						default:
+							break;	
+						#elif Manual == 3
+						case 1: //X
+							ManualXMoving(target.x[0]);
+							break;
+						case 2: //Y
+							ManualYMoving(target.y[0]);
+							break;
+						case 3: //从料坑上升
+//							ManualRaisePawFromLitterPool(BURN_POOL_UZ);
+							ManualRaiseBigPaw(target.uwbdis[0]);
+							break;				
+						case 4: //从焚烧池上升
+							//ManualRisePawFromBurnPool(target.z[0]);
+							ManualRaiseBigPaw(target.uwbdis[0]);
+							break;
+						case 5: //从平台上升
+							//ManualRisePawFromPlatform(target.z[0]);
+							ManualRaiseBigPaw(target.uwbdis[0]);
+							break;	
+						case 6: //下降到垃圾池
+//							ManualDowntoLitterPool(BIG_CLAW_BASE_DIS);
+							ManualDowntoLitterPool(target.uwbdis[0]);
+							break;		
+						case 7: //下降到焚料池
+							//ManualDownClawtoBurnPool(target.z[0]);
+							ManualDownClawtoBurnPool(target.uwbdis[0]);
+							break;
+						case 8: //下降到平台
+							//ManualDownToOrigin(target.z[0]);
+							ManualDownToOrigin(target.uwbdis[0]);
+							break;		
+						case 9: //抓料
+							ManualClose();
+							break;	
+						case 10: //放料
+							ManualOpen();
+							break;		
+						case 11: //打开遥控器
+							ManualPowerOn();
+							break;	
+						case 12://关闭遥控器
+							ManualPowerOff();
+							break;								
+						default:
+							break;						
+						#endif
 					}			
 				}
 				else if(2==Run_Mode)//半自动
@@ -232,9 +323,7 @@ int main(void)
 		
 		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-			UART4_Upper_f_Computer(mpu.acc_z,0,0,0);
-//			adc1 = 5.0f*((ADC_Converted_Buff[0]*3300.0f)/4096.0f)-3000.0f;
-//			adc2 = 5.0f*((ADC_Converted_Buff[1]*3300.0f)/4096.0f)-3000.0f;
+//			UART4_Upper_f_Computer(mpu.acc_z,0,0,0);
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//200ms上传一次数据		

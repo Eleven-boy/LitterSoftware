@@ -314,7 +314,8 @@ void USARTx_IRQHandler(void)
 						laser.sampleval6 = (u1_receive_buff[4]<<8|u1_receive_buff[3]);	
 						laser.sampleval7 = (u1_receive_buff[6]<<8|u1_receive_buff[5]);	
 						laser.dis5 = 5.0f*((laser.sampleval5*3300.0f)/4096.0f)-3000.0f+60.0f;//¼ì²â´ó×¥
-						laser.dis6 = 10.0f*((laser.sampleval6*3300.0f)/4096.0f)-6000.0f+60.0f;//X
+//						laser.dis6 = 10.0f*((laser.sampleval6*3300.0f)/4096.0f)-6000.0f+60.0f;//X
+						laser.dis6 = 0.5*(10.0f*((laser.sampleval6*3300.0f)/4096.0f)-6000.0f+60.0f);//X
 						laser.dis7 = 5.0f*((laser.sampleval7*3300.0f)/4096.0f)-3000.0f+60.0f;//Y
 						Up_Data.P_x = (int)laser.dis6;
 						Up_Data.P_y = (int)laser.dis7;

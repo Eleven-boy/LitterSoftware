@@ -47,13 +47,13 @@ int PointMoveTime = 0;
 uint8_t UpOrDown = 0;//0代表上半部，1代表下半部
 
 //1：表示合拢
-uint8_t CloseFlag = 0;
+int CloseFlag = -1;
 //合拢延时
-int     CloseDelay = 0;
+int CloseDelay = 0;
 //1:表示打开
-uint8_t OpenFlag = 0;
+int OpenFlag = -1;
 //打开延时
-int     OpenDelay = 0;
+int OpenDelay = 0;
 //出错状态
 uint8_t ErrorBigCar = 0;
 
@@ -76,21 +76,31 @@ Provar BCVar;
 *Notes       : 使用此函数前CloseFlag置1，此功能结束后会将CloseFlag和CloseDelay置零
 *****************************************************************************************************************
 */
+static void Close(void)
+{
+	Up_Data.Status = (Up_Data.Status&0x87)|0x38;//此时的状态值  close
+	if(CloseFlag>=0 && CloseFlag <= 50)
+	{
+		PAW_CLOSE(ON);
+	}
+	else if(CloseFlag>=50 && CloseFlag <=60)
+	{		
+		PAW_CLOSE(OFF);
+	}	 
+	else
+	{
+		CloseFlag = -2;
+	}
+}
 void ClosePaw(void)
 {
-	Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 close
-	if(1 == CloseFlag)
+	if(CloseFlag==-1)
 	{
-		if(CloseDelay<100)
-		{
-			PAW_CLOSE(ON);
-		}
-		else
-		{
-			PAW_CLOSE(OFF);	
-			CloseFlag = 2;
-			CloseDelay = 0;
-		}
+		CloseFlag = 0;
+	}
+	if(CloseFlag>=0)
+	{
+		Close();
 	}
 }
 /*
@@ -103,21 +113,31 @@ void ClosePaw(void)
 *Notes       : 使用此函数前OpenFlag置1，此功能结束后会将OpenFlag和OpenDelay置零
 *****************************************************************************************************************
 */
+static void Open(void)
+{
+	Up_Data.Status = (Up_Data.Status&0x87)|0x40;//此时的状态值  release
+	if(OpenFlag>=0 && OpenFlag <=50)
+	{
+		PAW_RELEASE(ON);
+	}
+	else if(OpenFlag>=50 && OpenFlag <=60)
+	{		
+		PAW_RELEASE(OFF);
+	}	 
+	else
+	{
+		OpenFlag = -2;
+	}
+}
 void ReleasePaw(void)
 {
-	Up_Data.Status = (Up_Data.Status&0x87)|0x38;//此时的状态值  release
-	if(1 == OpenFlag)
+	if(OpenFlag==-1)
 	{
-		if(OpenDelay<100)
-		{
-			PAW_RELEASE(ON);
-		}
-		else
-		{
-			PAW_RELEASE(OFF);	
-			OpenFlag = 2;
-			OpenDelay = 0;
-		}
+		OpenFlag = 0;
+	}
+	if(OpenFlag>=0)
+	{
+		Open();
 	}
 }
 /*
@@ -166,14 +186,14 @@ void XMoving(float x)
 		//Now is moving to the X destination
 		if(err_x<0)//大行车向南移动
 		{
-			Up_Data.Status = (Up_Data.Status&0x87)|0x08;//此时的状态值 x-
+			Up_Data.Status = (Up_Data.Status&0x87)|0x10;//此时的状态值 x-
 			//大行车开始向南移动
 			CAR_SOUTH(ON);
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);  		
 		}
 		else if(err_x>0)//大行车开始向北运动
 		{
-			Up_Data.Status = (Up_Data.Status&0x87)|0x00;//此时的状态值 x+
+			Up_Data.Status = (Up_Data.Status&0x87)|0x08;//此时的状态值 x+
 			//大行车开始向北运动
 			CAR_NORTH(ON);		
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);	
@@ -223,8 +243,7 @@ void XMoving(float x)
 				PointMove = 0;
 				PointMoveTime = 0;
 				X_MOVE_BIT = 1;
-			}
-			
+			}			
 		}
 	}
 }
@@ -273,13 +292,13 @@ void YMoving(float y)
 		//Now is moving to the Y destnation
 		if ((err_y>0))//大行车向东运动
 		{
-			Up_Data.Status = (Up_Data.Status&0x87)|0x10;//此时的状态值 y+
+			Up_Data.Status = (Up_Data.Status&0x87)|0x18;//此时的状态值 y+
 			CAR_EAST(ON); 
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}
 		else if ((err_y<0))//大行车向西运动
 		{
-			Up_Data.Status = (Up_Data.Status&0x87)|0x18;//此时的状态值 y-
+			Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 y-
 			CAR_WEST(ON);
 			//printf("X_south:nowDis_x=%f,err_x=%f,nowDis_y=%f,err_y=%f\r\n",laser.dis6,err_x,laser.dis7,err_y);
 		}	
@@ -356,11 +375,11 @@ void UpPawFromBurnPool(float z)
 	/*情况1：正常情况运行*/
 	if((abs(paw_err)>300)&&(laser.dis8>0))//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
-		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 up
 		if(paw_err>=0)//大爪上升
 		{
 			PAW_UP(ON);	
-			LED1_TOGGLE;
+			//LED1_TOGGLE;
 		}
 	}
 	else if((abs(paw_err)<300)&&(laser.dis8>0))//实际距离和期望距离偏差小于0.3米，大爪停止上升
@@ -424,7 +443,7 @@ void UpPawFromPlatform(float z)
 	/*情况1：正常情况运行*/
 	if((abs(paw_err)>300)&&(laser.dis1>0))//实际距离和期望距离偏差大于0.3米，大爪上升
  	{
-		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 up
 		if(paw_err<=0)//大爪上升
 		{
 			PAW_UP(ON);	
@@ -479,7 +498,7 @@ void UpPawFromLitterPool(float z)
 
 	if(1==UpOrDown)//在下半部分，用往下射的激光 12米 dis1
 	{
-		Up_Data.Status = (Up_Data.Status&0x87)|0x20;//此时的状态值 up
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 up
 		
 		if((laser.dis1>0 && laser.dis1<10000) && laser.dis8<0)
 		{
@@ -581,7 +600,7 @@ void DownPawToBurnPool(float z)
 	/*情况1：正常情况运行*/
 	if((abs(paw_err)>300)&&(laser.dis8>0))//实际距离和期望距离偏差大于0.3米，大爪下降
 	{
-		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down
+		Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down
 		if(paw_err<=0)//大爪下降
 		{
 			PAW_DOWN(ON);	
@@ -643,7 +662,7 @@ void DownPawToLitterPool(float z)
 	
 	if(0==UpOrDown)//用往上射的激光  24米  dis8
 	{		
-		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down
+		Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down
 		if((laser.dis8>0 && laser.dis8<21000) && laser.dis1<0)
 		{
 			PAW_DOWN(ON);	
@@ -720,7 +739,6 @@ void DownPawToLitterPool(float z)
 			if (abs(paw_err-paw_err_last)<50)//处理已经下降到底部，但还在下降的情况
 			{
 				same_dis_count = same_dis_count+1;
-				
 				if (same_dis_count>100)
 				{
 					PAW_DOWN(OFF);
@@ -775,9 +793,9 @@ void DownPawToPlatform(float z)
 	paw_err = laser.dis1 - z;   
 	laser.last_dis1 = laser.dis1;   
 	
-  Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 down	
+  Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down	
 	//大爪下降
-	if((abs(paw_err)>1000)&&(laser.dis1>0))//大爪下降
+	if((abs(paw_err)>500)&&(laser.dis1>0))//大爪下降
 	{
 		if(paw_err>=0)//大爪下降
 		{
@@ -785,21 +803,29 @@ void DownPawToPlatform(float z)
 		}
 	}
 	//大爪下降到指定高度，准备点动
-	else if((abs(paw_err)<1000)&&(laser.dis1>0))//大爪下降到指定高度，准备点动
+	else if((abs(paw_err)<500)&&(laser.dis1>0))//大爪下降到指定高度，准备点动
  	{
 		/*情况1：正常情况运行*/
-		if(paw_err>200)//开始点动
-		{
-			VerticalDotMove(paw_err);
+		if(z < 1600.0f){//靠近地面时点动
+			if(paw_err>200)//开始点动
+			{
+				VerticalDotMove(paw_err);
+			}
+			else//点动结束
+			{
+				PAW_DOWN(OFF);						
+				PointMove = 0;
+				PointMoveTime = 0;	
+				DOWN_BIT = 1;
+			}		
 		}
-		else//点动结束
-		{
-			PAW_DOWN(OFF);			
-			
-			PointMove = 0;
-			PointMoveTime = 0;	
-			DOWN_BIT = 1;
+		else if(z > 1600.0f){//不靠近地面时无需点动
+			if(abs(paw_err)<200){
+				PAW_DOWN(OFF);			
+				DOWN_BIT = 1;
+			}
 		}
+
 		/*情况2：在点动时爪子倾斜过大*/
 		if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
 		{
@@ -1272,4 +1298,358 @@ void BigCarStop(void)//还需斟酌
 	ReverseStop = 0;
 	Run_Mode = 0;
 	WaitFlag = 0;	
+}
+/*
+*****************************************************************************************************************
+*                                     void RaiseBigPaw(float z)
+*
+*Description : 爪子上升程序（UWB 数据为主，往上面打的激光为辅）
+*Arguments   : float z：激光距顶部的高度
+*Returns     : none
+*Notes       : 此时用激光laser.dis8    情况2：需要现场微调
+*****************************************************************************************************************
+*/
+void RaiseBigPaw(float z){		
+	int paw_err=0; 
+	static int paw_err_last=0;
+	static int last_dis = 0;
+	static uint8_t same_dis_count=0;
+	
+	paw_err = mpu.dis - z;
+	last_dis = mpu.dis;
+	
+	/*情况1：正常情况运行*/
+	if((paw_err>300)&&(mpu.dis>0)){
+		Up_Data.Status = (Up_Data.Status&0x87)|0x28;//此时的状态值 up
+		PAW_UP(ON);
+	}
+	else if((paw_err<300)&&(mpu.dis>0)){
+		PAW_UP(OFF);
+		UP_BIT = 1;//上升完成标志位置1
+	}
+	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
+//	if (abs(paw_err-paw_err_last)<50){//处理已经上升到限位的情况  此处的距离和累计次数需要微调
+//		same_dis_count = same_dis_count+1;	
+//		if (same_dis_count>100)
+//		{
+//			PAW_UP(OFF);
+//			same_dis_count=0;		
+//			UP_BIT = 1;
+//		}	
+//	}	
+//	else
+//	{
+//		same_dis_count=0;
+//	}
+//	paw_err_last=paw_err;			
+}
+/*
+*****************************************************************************************************************
+*                                     void DeclineBigPawtoLitter(float z)
+*
+*Description : 爪子下降程序（UWB 数据为主，往上面打的激光为辅）
+*Arguments   : float z：爪子距上面大行车的距离
+*Returns     : none
+*Notes       : 此时用激光laser.dis1    情况3：需要现场微调
+*****************************************************************************************************************
+*/
+void DeclineBigPawtoLitterPool(float z){
+	int             uwbDisErr=0; 
+	static int      uwbErrLast=0;
+	static int      uwbLastDis=0;
+	static uint8_t  uwbSameDisCount=0;
+	
+	int             laserDisErr=0; 
+	static int      laserErrLast=0;
+	static int      laserLastDis=0;
+	static uint8_t  laserSameDisCount=0;
+	static uint8_t  Dis1ErrCount=0;
+	static int      laserTarget = 0;
+	
+	static u8 uwbOrlaser = 0;
+	
+	uwbDisErr  = z-mpu.dis;
+	uwbLastDis = mpu.dis;
+	
+	//目标位置距大行车小于20米，说明距地面距离比较大，没必要点动
+	//到目标范围内直接停止即可，该范围要根据实际测试调节
+	if(z<20000){
+		if((uwbDisErr>300)&&(mpu.dis>0)){
+			Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down
+			PAW_DOWN(ON);		
+		}
+		else if((uwbDisErr<300)&&(mpu.dis>0)){
+			PAW_DOWN(OFF);	
+			DOWN_BIT = 1;
+		}
+	}
+	//目标位置距大行车大于20米，说明目标位置距地面很近，最后阶段有必要点动
+	else if(z>20000){
+		if((uwbDisErr>1000)&&(mpu.dis>0)&&(uwbOrlaser==0)){
+			PAW_DOWN(ON);
+			if (laser.dis1>0)
+			{
+				laserSameDisCount = laserSameDisCount+1;			
+				if (laserSameDisCount>100)
+				{
+					uwbOrlaser = 1;
+					laserSameDisCount=0;
+					laser.last_dis1 = laser.dis1; 
+					laserTarget = laser.dis1-(z-mpu.dis);//换算到激光后的目标位置
+				}	
+			}
+			else
+			{
+				laserSameDisCount=0;
+			}	
+		}
+		
+		if(uwbOrlaser==1){
+			if (laser.dis1<0)//滤除偶尔出现的错误值
+			{
+				if(Dis1ErrCount<100)
+				{
+					Dis1ErrCount++;
+					laser.dis1=laser.last_dis1;
+				}
+				else//一直出现负值，停止运动出问题了
+				{
+					PAW_DOWN(OFF);
+					Dis1ErrCount=0;
+					uwbOrlaser = 0;
+					DOWN_BIT = 2;			
+				}
+			}
+			else if(laser.dis1>0){
+				Dis1ErrCount=0;
+			}
+			
+			laserDisErr = laser.dis1 - laserTarget;   
+			laser.last_dis1 = laser.dis1;  
+			
+			//大爪下降到指定高度，准备点动
+			if(abs(laserDisErr)<1000)//大爪下降到指定高度，准备点动
+			{
+				/*情况1：正常情况运行*/
+				if(laserDisErr>200)//开始点动
+				{
+					VerticalDotMove(laserDisErr);
+				}
+				else//点动结束
+				{
+					PAW_DOWN(OFF);	
+					uwbOrlaser = 0;
+					PointMove = 0;
+					PointMoveTime = 0;	
+					DOWN_BIT = 1;
+				}
+				/*情况2：在点动时爪子倾斜过大*/
+				if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
+				{
+					PAW_DOWN(OFF);
+					uwbOrlaser = 0;
+					PointMove = 0;
+					PointMoveTime = 0;	
+					DOWN_BIT = 1;
+				} 		
+				/*情况3：爪子无法下降，但是绳索仍然下降*/
+				if (abs(laserDisErr-laserErrLast)<50)//处理已经下降到底部，但还在下降的情况
+				{
+					laserSameDisCount = laserSameDisCount+1;
+					if (laserSameDisCount>100)
+					{
+						PAW_DOWN(OFF);
+						laserSameDisCount = 0;
+						uwbOrlaser = 0;
+						PointMove = 0;
+						PointMoveTime = 0;
+						laserSameDisCount = 0;				
+						DOWN_BIT = 1;
+					}	
+				}
+				else
+				{
+					laserSameDisCount=0;
+				}
+				laserErrLast=laserDisErr;				
+			}				
+		}		
+	}
+}
+/*
+*****************************************************************************************************************
+*                                     void DeclineBigPawtoPlatForm(float z)
+*
+*Description : 爪子下降程序（UWB 数据为主，往上面打的激光为辅）
+*Arguments   : float z：爪子距上面大行车的距离
+*Returns     : none
+*Notes       : 此时用激光laser.dis1    情况3：需要现场微调  mpu数据也需要微调
+*****************************************************************************************************************
+*/
+void DeclineBigPawtoPlatForm(float z){
+	int             uwbDisErr=0; 
+	static int      uwbErrLast=0;
+	static int      uwbLastDis=0;
+	static uint8_t  uwbSameDisCount=0;
+	
+	int             laserDisErr=0; 
+	static int      laserErrLast=0;
+	static int      laserLastDis=0;
+	static uint8_t  laserSameDisCount=0;
+	static uint8_t  Dis1ErrCount=0;
+	static int      laserTarget = 0;
+	
+	static u8 uwbOrlaser = 0;//0:用uwb数据；1:用激光数据
+	
+	uwbDisErr  = z-mpu.dis;
+	uwbLastDis = mpu.dis;
+	
+	//目标位置距大行车小于5米，说明距地面比较远，没必要点动
+	//到目标范围内直接停止即可，该范围要根据实际测试调节
+	if(z<2000){//测试2米
+		if((uwbDisErr>500)&&(mpu.dis>0)){
+			Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down
+			PAW_DOWN(ON);		
+		}
+		else if((uwbDisErr<500)&&(mpu.dis>0)){
+			PAW_DOWN(OFF);	
+			DOWN_BIT = 1;
+		}
+	}
+	//目标位置距大行车大于5米，说明目标位置距地面很近，最后阶段有必要点动
+	else if(z>2000){//测试2米
+		if((uwbDisErr>500)&&(mpu.dis>0)&&(uwbOrlaser==0)){
+			PAW_DOWN(ON);
+			if (laser.dis1>0)
+			{
+				laserSameDisCount = laserSameDisCount+1;			
+				if (laserSameDisCount>100)
+				{
+					uwbOrlaser = 1;
+					laserSameDisCount=0;
+					laser.last_dis1 = laser.dis1; 
+					laserTarget = laser.dis1-(z-mpu.dis);//换算到激光后的目标位置
+				}	
+			}
+			else
+			{
+				laserSameDisCount=0;
+			}	
+		}
+		
+		if(uwbOrlaser==1){
+			if (laser.dis1<=0)//滤除偶尔出现的错误值
+			{
+				if(Dis1ErrCount<100)
+				{
+					Dis1ErrCount++;
+					laser.dis1=laser.last_dis1;
+				}
+				else//一直出现负值，停止运动出问题了
+				{
+					PAW_DOWN(OFF);
+					Dis1ErrCount=0;
+					uwbOrlaser = 0;
+					DOWN_BIT = 2;			
+				}
+			}
+			else if(laser.dis1>0){
+				Dis1ErrCount=0;
+			}
+			
+			laserDisErr = laser.dis1 - laserTarget;   
+			laser.last_dis1 = laser.dis1;  
+			
+			//大爪下降到指定高度，准备点动
+			if(abs(laserDisErr)<500)//大爪下降到指定高度，准备点动
+			{
+				/*情况1：正常情况运行*/
+				if(laserDisErr>200)//开始点动
+				{
+					VerticalDotMove(laserDisErr);
+				}
+				else//点动结束
+				{
+					PAW_DOWN(OFF);	
+					uwbOrlaser = 0;
+					PointMove = 0;
+					PointMoveTime = 0;	
+					DOWN_BIT = 1;
+				}
+				/*情况2：在点动时爪子倾斜过大*/
+				if ((abs(mpu.angle_x)>10.0f)||(abs(mpu.angle_y)>10.0f))//爪子倾斜超过一定角度，停止下降，跳出循环
+				{
+					PAW_DOWN(OFF);
+					uwbOrlaser = 0;
+					PointMove = 0;
+					PointMoveTime = 0;	
+					DOWN_BIT = 1;
+				} 		
+				/*情况3：爪子无法下降，但是绳索仍然下降*/
+//				if (abs(laserDisErr-laserErrLast)<50)//处理已经下降到底部，但还在下降的情况
+//				{
+//					laserSameDisCount = laserSameDisCount+1;
+//					if (laserSameDisCount>100)
+//					{
+//						PAW_DOWN(OFF);
+//						laserSameDisCount=0;
+//						uwbOrlaser = 0;
+//						PointMove = 0;
+//						PointMoveTime = 0;
+//						laserSameDisCount=0;				
+//						DOWN_BIT = 1;
+//					}	
+//				}
+//				else
+//				{
+//					laserSameDisCount=0;
+//				}
+//				laserErrLast=laserDisErr;				
+			}				
+		}		
+	}
+}
+/*
+*****************************************************************************************************************
+*                                     void DeclineBigPawtoBurnPool(float z)
+*
+*Description : 爪子下降程序（UWB 数据为主，往上面打的激光为辅）
+*Arguments   : float z：爪子距上面大行车的距离
+*Returns     : none
+*Notes       : 情况3：需要现场微调   mpu数据也需要微调
+*****************************************************************************************************************
+*/
+void DeclineBigPawtoBurnPool(float z){
+	int            paw_err=0; 
+	static int     paw_err_last=0;
+	static int     last_dis = 0;
+	static uint8_t same_dis_count=0;
+	
+	paw_err = z - mpu.dis;
+	last_dis = mpu.dis;
+	
+	/*情况1：正常情况运行*/
+	if((paw_err>300)&&(mpu.dis>0)){
+		Up_Data.Status = (Up_Data.Status&0x87)|0x30;//此时的状态值 down
+		PAW_DOWN(ON);
+	}
+	else if((paw_err<300)&&(mpu.dis>0)){
+		PAW_DOWN(OFF);
+		DOWN_BIT = 1;//上升完成标志位置1
+	}
+	/*情况2：爪子无法上升，但是abs(paw_err)>300*/
+//	if (abs(paw_err-paw_err_last)<50){//处理已经上升到限位的情况  此处的距离和累计次数需要微调
+//		same_dis_count = same_dis_count+1;	
+//		if (same_dis_count>100)
+//		{
+//			PAW_DOWN(OFF);
+//			same_dis_count=0;		
+//			DOWN_BIT = 1;
+//		}	
+//	}	
+//	else
+//	{
+//		same_dis_count=0;
+//	}
+//	paw_err_last=paw_err;		
 }

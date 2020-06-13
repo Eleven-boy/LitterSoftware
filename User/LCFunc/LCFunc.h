@@ -52,11 +52,11 @@ extern uint8_t UpOrDown;
 extern uint8_t ErrorBigCar;
 extern uint8_t ManualError;
 //1：表示合拢
-extern uint8_t CloseFlag;
+extern int CloseFlag;
 //合拢延时
 extern int     CloseDelay;
 //1:表示打开
-extern uint8_t OpenFlag;
+extern int OpenFlag;
 //打开延时
 extern int     OpenDelay;
 
@@ -101,5 +101,10 @@ extern void RequestStart(uint8_t dev);
 extern void TaskSuspend(void);
 extern void ConExecute(void);
 extern void BigCarStop(void);
+
+extern void RaiseBigPaw(float z);
+extern void DeclineBigPawtoLitterPool(float z);
+extern void DeclineBigPawtoPlatForm(float z);
+extern void DeclineBigPawtoBurnPool(float z);
 #endif /* __TASK_H */
 
