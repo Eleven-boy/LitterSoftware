@@ -158,7 +158,7 @@ void XMoving(float x)
 	
 	if (laser.dis6<0)//滤除偶尔出现的错误值
 	{
-		if(dis6_error_count<10)
+		if(dis6_error_count<100)
 		{
 			dis6_error_count++;
 			laser.dis6=laser.last_dis6;
@@ -166,7 +166,7 @@ void XMoving(float x)
 		else//一直出现负值，停止运动出问题了
 		{
 			CAR_NORTH(OFF);
-			CAR_SOUTH(OFF);
+			CAR_SOUTH(OFF); 
 			dis6_error_count=0;
 			X_MOVE_BIT = 2;			
 		}
@@ -181,7 +181,6 @@ void XMoving(float x)
 	
 	if((abs(err_x)>2000)&&(laser.dis6>0))//偏差大于一定范围时，要移动	
 	{
-		
 		err_x = laser.dis6 - x;    //24米
 		//Now is moving to the X destination
 		if(err_x<0)//大行车向南移动
@@ -265,7 +264,7 @@ void YMoving(float y)
 	
 	if (laser.dis7<0)//滤除偶尔出现的错误值
 	{
-		if(dis7_error_count<10)
+		if(dis7_error_count<100)
 		{
 			dis7_error_count++;
 			laser.dis7=laser.last_dis7;

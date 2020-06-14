@@ -33,6 +33,10 @@
 #define BURN_POOL_UZ  3000            //大行车在焚料池上方上升时上面激光剧顶部距离
 #define PLATFORM_UZ   3000            //大行车在五楼平台上方上升时下面激光距底部距离   
 
+
+#define UWBUPDIS               3000            //大行车抬升到目标位置大爪子距大车的距离
+#define UWBDOWNBURNPOOLDIS     5000            //大行车下降到焚料池上的目标位置大爪子距大车的距离
+
 #define abs(x)  ((x<0)?(-(x)):x)       //求x的绝对值
 
 extern uint8_t X_MOVE_BIT;

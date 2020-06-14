@@ -17,7 +17,7 @@
  *************************************************************************  
  */
  //1:在此步完成后需要请求是否执行下一步
- //0:在此步完成后不需要请求，直接执行下一步
+ //0:在此步完成后不需要请求，直接执行下一步，等同于全自动
  #define RESTEP_1      0// 是否从四楼平台抬升爪子
  #define RESTEP_2      0// 是否水平移动到抓料处正上方
  #define RESTEP_3      0// 是否爪子开始下降去抓料
@@ -40,7 +40,7 @@ extern POSITION target;//目标位置
 extern uint8_t WaitFlag;
 extern uint8_t Run_Mode;
 
-uint8_t HalfAutoStep = 0;
+uint8_t HalfAutoStep = 0;//半自动下运行步骤
 uint8_t SingleStepOver = 0;//0:代表此步正在执行；1:代表在此步执行结束
 int8_t IsExecute = -1;//1:执行下一步,0：不执行下一步
 /*
@@ -57,7 +57,7 @@ void BigCarHalfAutoMode(void)
 {
 	if(0==HalfAutoStep)//行车上电
  	{
-		if(0==SingleStepOver)
+		if(0==SingleStepOver)//步骤0：遥控器上电
 		{
 			PowerOn();
 			if(RelayOnflag==-2)
@@ -73,7 +73,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -101,7 +101,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -114,8 +114,8 @@ void BigCarHalfAutoMode(void)
 	{
 		if(0==SingleStepOver)
 		{
-			target.x[0] = (GARBAGE_X-target.x[0]-BIG_CAR_X_OFFSET)+ADD_X;
-			HorizontalMoving(target.x[0],target.y[0]);
+			int target_x = (GARBAGE_X-target.x[0]-BIG_CAR_X_OFFSET)+ADD_X;
+			HorizontalMoving(target_x,target.y[0]);
 			if((1==X_MOVE_BIT)&&(1==Y_MOVE_BIT))
 			{
 				#if RESTEP_1==0  //直接进行下一步
@@ -131,7 +131,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -145,7 +145,8 @@ void BigCarHalfAutoMode(void)
 	{
 		if(0==SingleStepOver)
 		{
-			DowntoLitterPool(target.z[0]);
+//			DowntoLitterPool(target.z[0]);
+			DowntoLitterPool(target.uwbdis[0]);
 			if(1==DOWN_BIT)
 			{
 				#if RESTEP_1==0  //直接进行下一步
@@ -160,7 +161,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -175,7 +176,7 @@ void BigCarHalfAutoMode(void)
 		if(0==SingleStepOver)
 		{
 			HFClosePaw();
-			if(2==CloseFlag)
+			if(-2==CloseFlag)
 			{
 				#if RESTEP_1==0  //直接进行下一步
 					HalfAutoStep++;
@@ -183,13 +184,13 @@ void BigCarHalfAutoMode(void)
 				#elif RESTEP_1==1 //表示此步执行结束
 					SingleStepOver=1;
 				#endif
-				CloseFlag = 0; //标志位复位				
+				CloseFlag = -1; //标志位复位				
 			}			
 		}
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -217,7 +218,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -245,7 +246,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -273,7 +274,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -283,25 +284,25 @@ void BigCarHalfAutoMode(void)
 			}
 		}
 	}
-	else if(7==HalfAutoStep)//松开爪子放料
+	else if(8==HalfAutoStep)//松开爪子放料
 	{
 		if(0==SingleStepOver)
 		{
 			HFOpenPaw();
-			if(2==OpenFlag)
+			if(-2==OpenFlag)
 			{
 				#if RESTEP_1==0  //直接进行下一步
 					HalfAutoStep++;
 				#elif RESTEP_1==1 //表示此步执行结束
 					SingleStepOver=1;
 				#endif
-				OpenFlag=0;    //标志位复位	
+				OpenFlag=-1;    //标志位复位	
 			}
 		}
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -310,7 +311,7 @@ void BigCarHalfAutoMode(void)
 			}
 		}
 	}
-	else if(8==HalfAutoStep)//提升爪子至安全高度
+	else if(9==HalfAutoStep)//提升爪子至安全高度
 	{
 		if(0==SingleStepOver)
 		{
@@ -328,7 +329,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -337,7 +338,7 @@ void BigCarHalfAutoMode(void)
 			}
 		}
 	}
-	else if(9==HalfAutoStep)//水平移动到初始位置上方
+	else if(10==HalfAutoStep)//水平移动到初始位置上方
 	{
 		if(0==SingleStepOver)
 		{
@@ -356,7 +357,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -365,7 +366,7 @@ void BigCarHalfAutoMode(void)
 			}
 		}
 	}
-	else if(10==HalfAutoStep)//将爪子下降到四楼平台
+	else if(11==HalfAutoStep)//将爪子下降到四楼平台
 	{
 		if(0==SingleStepOver)
 		{
@@ -383,7 +384,7 @@ void BigCarHalfAutoMode(void)
 		else if(1==SingleStepOver)
 		{
 			ConfirmNextStep(HalfAutoStep+1);
-			if(1==IsExecute)//经上位机确定执行下一步
+			if((HalfAutoStep+1)==IsExecute)//经上位机确定执行下一步
 			{
 				Up_Data.HalfStep = 0;
 				HalfAutoStep++;
@@ -392,7 +393,7 @@ void BigCarHalfAutoMode(void)
 			}
 		}
 	}
-	else if(11==HalfAutoStep)//断开电源,运行结束
+	else if(12==HalfAutoStep)//断开电源,运行结束
 	{
 		PowerOff();
 		if(RelayOffflag==-2)

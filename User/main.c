@@ -68,7 +68,6 @@ char a[6] = {0x00,0x02,0x0A,0x02,0x12,0x11};
 int adc1,adc2;
 int main(void)
 {	
-	//uint8_t Choice = 0;
 	SysTick_Init();                 //系统时钟初始化
   BSP_Init();                     //相关硬件初始化 
 
@@ -85,11 +84,11 @@ int main(void)
 //		delay_ms(1000);
 //	}
 	
-	while((0==BigCarDataCorrect))
-	{
-		DataCommunicateManage(BIG_CAR,1);//请求大爪数据
-		delay_ms(1000);
-	}
+//	while((0==BigCarDataCorrect))
+//	{
+//		DataCommunicateManage(BIG_CAR,1);//请求大爪数据
+//		delay_ms(1000);
+//	}
 	Up_Data.Status = Up_Data.Status|0xF0;	//初始状态设为正常状态，最高位置1
 
 
@@ -323,7 +322,6 @@ int main(void)
 		
 		if(task_tim.time_200ms >= 400)//200ms发送
 		{
-//			UART4_Upper_f_Computer(mpu.acc_z,0,0,0);
 			if(1==Up_Data_Flag)
 			{
 				RS485_Send_Data();//200ms上传一次数据		
@@ -331,7 +329,7 @@ int main(void)
 				CommunicatDelay = 0;								
 			}
 			//出错报警
-			if((!ErrorBigCar)||(1==ManualError))
+			if((ErrorBigCar != 0)||(1==ManualError))
 			{
 				ALARM_ON;
 			}

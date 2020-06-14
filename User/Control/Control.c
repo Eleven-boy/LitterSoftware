@@ -4,7 +4,6 @@
 #include "uart4.h"
 #include "usart2.h"
 #include "beep.h"
-#include "task.h"
 #include "LCFunc.h"
 #include "relay.h"
 

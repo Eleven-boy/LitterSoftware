@@ -193,12 +193,27 @@ void RisePawFromPlatform(void)
 		if(UP_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  UpPawFromPlatform(PLATFORM_UZ);		
+//		  UpPawFromPlatform(PLATFORM_UZ);		//以激光为主要传感器
+			RaiseBigPaw(UWBUPDIS);//以uwbdis为主要传感器数据
 		}
-		else if(UP_BIT == 1)
+		else if(UP_BIT == 1)/*上升正常结束*/
 		{
-			/*上升结束*/
+			
 		}
+//		else if(UP_BIT == 2){//运行过程中出现异常结束
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				UP_BIT = 0;//复位
+//			}			
+//		}
 	}
 }
 /*
@@ -225,10 +240,22 @@ void HorizontalMoving(float x,float y)
 			//大行车Y方向移动
 			YMoving(y);		
 		}
-		else
-		{
-			/*水平移动结束*/
-		}
+//		else if(X_MOVE_BIT == 2 && Y_MOVE_BIT == 2)/*水平移动出现异常结束*/
+//		{
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				X_MOVE_BIT = 0;//复位
+//				Y_MOVE_BIT = 0;//复位
+//			}					
+//		}
 	}
 }
 
@@ -249,12 +276,28 @@ void DowntoLitterPool(float z)
 		if(DOWN_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  DownPawToLitterPool(z);		
+//		  DownPawToLitterPool(z);//激光为主		
+			DeclineBigPawtoLitterPool(z);//以uwb数据为主
 		}
 		else if(DOWN_BIT == 1)
 		{
 			/*下降结束*/
 		}
+//		else if(DOWN_BIT == 2)//因出错而异常结束
+//		{
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				DOWN_BIT = 0;//复位
+//			}			
+//		}
 	}
 }
 /*
@@ -288,12 +331,27 @@ void RisePawFromLitterPool(void)
 		if(UP_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  UpPawFromLitterPool(BURN_POOL_UZ);		
+		  //UpPawFromLitterPool(BURN_POOL_UZ);		//激光为主
+			RaiseBigPaw(UWBUPDIS);//以uwbdis为主要传感器数据
 		}
 		else if(UP_BIT == 1)
 		{
 			/*上升结束*/
 		}
+//		else if(UP_BIT == 2){//运行过程中出现异常结束
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				UP_BIT = 0;//复位
+//			}			
+//		}
 	}	
 }
 /*
@@ -313,12 +371,27 @@ void DownClawtoBurnPool(void)
 		if(DOWN_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  DownPawToLitterPool(BURN_POOL_DZ);		
+//		  DownPawToLitterPool(BURN_POOL_DZ);	//激光为主
+			DeclineBigPawtoBurnPool(UWBDOWNBURNPOOLDIS);
 		}
 		else if(DOWN_BIT == 1)
 		{
 			/*下放结束*/
 		}
+//		else if(DOWN_BIT == 2){//运行过程中出现异常结束
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				DOWN_BIT = 0;//复位
+//			}			
+//		}		
 	}	
 }
 /*
@@ -352,12 +425,27 @@ void RisePawFromBurnPool(void)
 		if(UP_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  UpPawFromBurnPool(BURN_POOL_UZ);		
+//		  UpPawFromBurnPool(BURN_POOL_UZ);//激光为主	
+			RaiseBigPaw(UWBUPDIS);//以uwbdis为主要传感器数据
 		}
 		else if(DOWN_BIT == 1)
 		{
 			/*上升结束*/
 		}
+//		else if(UP_BIT == 2){//运行过程中出现异常结束
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				UP_BIT = 0;//复位
+//			}			
+//		}
 	}	
 }
 /*
@@ -377,12 +465,26 @@ void DownToOrigin(float z)
 		if(DOWN_BIT == 0)
 		{
 			//printf("down:acc_z=%f,gyro_z=%f,angle_x=%f,angle_y=%f,angle_z=%f,dis=%f\r\n",mpu.acc_z,mpu.gyro_z,mpu.angle_x,mpu.angle_y,mpu.angle_z,laser.dis1);
-		  DownPawToPlatform(z);		
-			
+//		  DownPawToPlatform(z);		//激光为主
+			DeclineBigPawtoPlatForm(z);
 		}
 		else if(DOWN_BIT == 1)
 		{
 			/*下降结束*/
 		}
+//		else if(DOWN_BIT == 2){//运行过程中出现异常结束
+//			PowerOff();
+//			ManualError = 1;//表示出错
+//			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
+//			if(RelayOffflag==-2)
+//			{		
+//				RelayOnflag = -1;//复位
+//				RelayOffflag = -1;//复位
+//				HTaskModeFlag=0;//无任务模式
+//				WaitFlag = 0;//进入等待状态
+//				Run_Mode = 0;//模式复位
+//				DOWN_BIT = 0;//复位
+//			}			
+//		}
 	}
 }

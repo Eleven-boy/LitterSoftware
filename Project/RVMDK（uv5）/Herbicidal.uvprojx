@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\User\systick;..\..\User\GPIO;..\..\User\led;..\..\User\Beep;..\..\User\key;..\..\User\basic_tim;..\..\User\UART4;..\..\User\USART1;..\..\User\USART2;..\..\User\USART3;..\..\User\USART6;..\..\User\ADC;..\..\User\Data_type;..\..\User\Control;..\..\User\relay;..\..\User\alarm;..\..\User\exti;..\..\User\Task;..\..\User\CRC;..\..\User\LCFunc;..\..\User\Manual;..\..\User\FullAuto;..\..\User\HalfAuto;..\..\User\RS485</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\User;..\..\User\systick;..\..\User\GPIO;..\..\User\led;..\..\User\Beep;..\..\User\key;..\..\User\basic_tim;..\..\User\UART4;..\..\User\USART1;..\..\User\USART2;..\..\User\USART3;..\..\User\USART6;..\..\User\ADC;..\..\User\Data_type;..\..\User\Control;..\..\User\relay;..\..\User\alarm;..\..\User\exti;..\..\User\CRC;..\..\User\LCFunc;..\..\User\Manual;..\..\User\FullAuto;..\..\User\HalfAuto;..\..\User\RS485</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

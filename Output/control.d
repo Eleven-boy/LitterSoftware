@@ -42,6 +42,5 @@
 ..\..\output\control.o: ..\..\User\USART2\usart2.h
 ..\..\output\control.o: ..\..\User\systick\bsp_SysTick.h
 ..\..\output\control.o: ..\..\User\Beep\beep.h
-..\..\output\control.o: ..\..\User\Task\task.h
 ..\..\output\control.o: ..\..\User\LCFunc\LCFunc.h
 ..\..\output\control.o: ..\..\User\relay\relay.h

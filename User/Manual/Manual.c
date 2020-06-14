@@ -1032,12 +1032,18 @@ void ManualDowntoLitterPool(float z)
 		}
 		else if(DOWN_BIT == 2)//运行过程中出错
 		{
+			PowerOff();
 			ManualError = 1;//表示出错
 			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
-			HTaskModeFlag=0;//无任务模式
-			WaitFlag = 0;//进入等待状态
-			Run_Mode = 0;//模式复位
-			DOWN_BIT = 0;//复位
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				DOWN_BIT = 0;//复位
+			}
 		}
 	}
 }
@@ -1074,13 +1080,19 @@ void ManualDownClawtoBurnPool(float z)
 			Up_Data.Status = (Up_Data.Status&0x87)|0x48;//此时的状态值 任务完成
 		}
 		else if(DOWN_BIT == 2)//运行过程中出错
-		{ 
+		{
+			PowerOff();
 			ManualError = 1;//表示出错
 			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
-			HTaskModeFlag=0;//无任务模式
-			WaitFlag = 0;//进入等待状态
-			Run_Mode = 0;//模式复位
-			DOWN_BIT = 0;//复位
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				DOWN_BIT = 0;//复位
+			}			
 		}
 	}	
 }
@@ -1118,12 +1130,18 @@ void ManualDownToOrigin(float z)
 		}
 		else if(DOWN_BIT == 2)//运行过程中出错
 		{
+			PowerOff();
 			ManualError = 1;//表示出错
 			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
-			HTaskModeFlag=0;//无任务模式
-			WaitFlag = 0;//进入等待状态
-			Run_Mode = 0;//模式复位
-			DOWN_BIT = 0;//复位
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				DOWN_BIT = 0;//复位
+			}			
 		}
 	}
 }
@@ -1155,13 +1173,18 @@ void ManualRaiseBigPaw(float z){
 		}
 		else if(UP_BIT == 2)//运行过程中出错
 		{
+			PowerOff();
 			ManualError = 1;//表示出错
 			Up_Data.Status = Up_Data.Status&0x7F;//此时的状态  运行出错
-			HTaskModeFlag=0;//无任务模式
-			WaitFlag = 0;//进入等待状态
-			Run_Mode = 0;//模式复位
-			UP_BIT = 0;//复位
-
+			if(RelayOffflag==-2)
+			{
+				RelayOnflag = -1;//复位
+				RelayOffflag = -1;//复位
+				HTaskModeFlag=0;//无任务模式
+				WaitFlag = 0;//进入等待状态
+				Run_Mode = 0;//模式复位
+				UP_BIT = 0;//复位
+			}
 		}
 	}		
 }

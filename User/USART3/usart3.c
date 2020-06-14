@@ -398,60 +398,19 @@ void USARTx_IRQHandler(void)
 						if(RelayOnflag == -2){
 							HTaskModeFlag = u3_receive_buff[2]>>3;
 							if(HTaskModeFlag == 1 || HTaskModeFlag == 2){//X,Y方向移动
-								WaitFlag = 1;
-								Run_Mode = 1;
-								target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
-								target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+								if((Up_Data.Status&0x78) != 0x48){
+									WaitFlag = 1;
+									Run_Mode = 1;
+									target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+									target.y[0] = ((int)u3_receive_buff[17]<<16)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 									
+								}
 							}		
 							else if(HTaskModeFlag >= 3 && HTaskModeFlag <= 8){//上升下降的几种模式
 								if((Up_Data.Status&0x78) != 0x48){
-									target.uwbdis[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
+									target.uwbdis[0] = ((int)u3_receive_buff[20]<<16)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
 									WaitFlag = 1;
 									Run_Mode = 1;									
 								}
-
-								/*
-								if(laser.dis6 > 10000.0f){//在垃圾池区域
-									if(target.uwbdis[0] < mpu.dis){//从料坑上升
-										HTaskModeFlag = 3;
-										WaitFlag = 1;
-										Run_Mode = 1;
-									}
-									else if(target.uwbdis[0] > mpu.dis){//从料坑下降
-										HTaskModeFlag = 6;
-										WaitFlag = 1;
-										Run_Mode = 1;
-									}
-								}
-								else if(laser.dis6 > 7000.0f && laser.dis6 < 9000.0f){//在4楼平台区域，用往下射的激光
-									if(target.uwbdis[0] < mpu.dis){//从平台上升
-										//target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
-										HTaskModeFlag = 5;
-										WaitFlag = 1;
-										Run_Mode = 1;
-									}
-									else if(target.uwbdis[0] > mpu.dis){//下降到平台
-//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
-										HTaskModeFlag = 8;
-										WaitFlag = 1;
-										Run_Mode = 1;										
-									}
-								}
-								else if(laser.dis6 > 4000.0f && laser.dis6 < 6000.0f){//在焚料池上方区域
-									if(target.uwbdis[0] < mpu.dis){//从焚料池上升
-//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
-										HTaskModeFlag = 4;
-										WaitFlag = 1;
-										Run_Mode = 1;	
-									}
-									else if(target.uwbdis[0] > mpu.dis){//下降到焚料池
-//										target.z[0] = ((int)u3_receive_buff[20]<<15)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);
-										HTaskModeFlag = 7;
-										WaitFlag = 1;
-										Run_Mode = 1;	
-									}
-								}
-								*/
 							}
 							else if(HTaskModeFlag == 9){//抓料
 								WaitFlag = 1;
@@ -462,7 +421,6 @@ void USARTx_IRQHandler(void)
 								Run_Mode = 1;	
 							}
 							else if(HTaskModeFlag == 0){
-//								temp=0;//清零
 								Up_Data.Status &= 0x87;//此时的状态值  无任务
 							}
 						}
@@ -477,11 +435,7 @@ void USARTx_IRQHandler(void)
 							WaitFlag = 1;
 							Run_Mode = 1;
 							HTaskModeFlag = 12;
-						}	
-//						else if(0 == (u3_receive_buff[21]&0x07))
-//						{
-//							Up_Data.Status &= 0x87;
-//						}								
+						}							
 
 						Up_Data.Status &= 0xF8;
 						Up_Data.Status |= 0x02;//返回该值，说明已成功接收到	
@@ -490,22 +444,26 @@ void USARTx_IRQHandler(void)
 					}
 					else if(3==(u3_receive_buff[2]&0x07))//半自动
 					{
-						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
-						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+						if((u3_receive_buff[21]&0x08)==0x08){//建图已完成，有效数据已发送
+							target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
+							target.y[0] = ((int)u3_receive_buff[17]<<16)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+							target.uwbdis[0] = ((int)u3_receive_buff[20]<<16)|((int)u3_receive_buff[19]<<8)|(u3_receive_buff[18]);						
+						
+							WaitFlag = 1;
+							Run_Mode = 2;	
+						}
 
-						if((u3_receive_buff[21]>>4)==0x01)
-							IsExecute = 1;//确认执行下一步
-						
-						WaitFlag = 1;
-						Run_Mode = 2;	
-						
+						if((u3_receive_buff[21]>>4) != 0 && IsExecute == 0)
+							IsExecute = u3_receive_buff[21]>>4;//确认执行下一步
+
 						Up_Data.Status &= 0xF8;
-						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到			
+						Up_Data.Status |= 0x03;//返回该值，说明已成功接收到	
+						Up_Data_Flag = 1;
 					}
 					else if(4==(u3_receive_buff[2]&0x07))//全自动
 					{
 						target.x[0] = ((int)u3_receive_buff[14]<<16)|((int)u3_receive_buff[13]<<8)|(u3_receive_buff[12]);
-						target.y[0] = ((int)u3_receive_buff[17]<<15)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
+						target.y[0] = ((int)u3_receive_buff[17]<<16)|((int)u3_receive_buff[16]<<8)|(u3_receive_buff[15]); 
 
 						WaitFlag = 1;
 						Run_Mode = 3;		
@@ -522,9 +480,6 @@ void USARTx_IRQHandler(void)
 	}else if(USART_GetITStatus(USARTx, USART_IT_TC) == SET)
 	{
 		USART_ClearITPendingBit(USARTx, USART_IT_TC);         //清除中断标志
-//		DMA_ClearFlag(DMA1_Stream3, DMA_FLAG_TCIF3 | DMA_FLAG_FEIF3 | 
-//					  DMA_FLAG_DMEIF3 | DMA_FLAG_TEIF3 | DMA_FLAG_HTIF3);
-//		DMA_ClearFlag(DMA1_Stream3, DMA_FLAG_TCIF3);
 		DMACLEAR;
 		DMA_Cmd(USART_TX_DMA, DISABLE); 
 		RS485_DE = 0;
